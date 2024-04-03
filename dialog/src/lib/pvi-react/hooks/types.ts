@@ -4,6 +4,6 @@ import { ViewModel, ViewPolicy } from "@lib/core/pvi/types";
 
 export type ViewHook = <Model extends ViewModel, Context>(param: {
   policy: ReturnType<ViewPolicy<[], Model>>;
-  repository: () => Promise<Typed<Model> | [Typed<Model>, Context] | void>;
+  repository: () => Promise<{ data: Typed<Model>; context?: Context }>;
   queryOptions?: SuspenseQueryConfigs;
 }) => { data: Typed<Model>; context?: Context };

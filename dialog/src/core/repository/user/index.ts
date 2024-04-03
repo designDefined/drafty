@@ -9,5 +9,6 @@ export const UserRepository = {
       .then(delay())
       .then(error(0))
       .then(UserDto.parse)
-      .then(mapUserDtoToUser),
+      .then(mapUserDtoToUser)
+      .then((data) => ({ data })),
 };
