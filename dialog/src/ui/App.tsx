@@ -1,10 +1,10 @@
-import { useEffect } from "react";
 import "./App.css";
-import { mockApi } from "@lib/fetch/mock";
+import { useEffect } from "react";
+import { UserRepository } from "@core/repository/user";
 
 function App() {
   useEffect(() => {
-    mockApi.get("").then(console.log);
+    UserRepository.me.then(console.log);
   }, []);
   return <>123</>;
 }

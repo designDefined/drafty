@@ -1,8 +1,14 @@
 {
-  "api": [
+  "me": {
+    "id": 1,
+    "name": "designDefined",
+    "createTime": "2024-04-03T05:00:00Z"
+  },
+  "user": [
     {
       "id": 1,
-      "value": "value1"
+      "name": "designDefined",
+      "createTime": "2024-04-03T05:00:00Z"
     }
   ]
 }

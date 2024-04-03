@@ -1,4 +1,4 @@
-import { User } from "@core/base/entities/user";
+import { User } from "@core/base/entity/user";
 import PVI from "@lib/core/pvi";
 import { viewPolicy } from "@core/policy/view";
 

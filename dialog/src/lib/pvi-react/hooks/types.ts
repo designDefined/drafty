@@ -1,4 +1,4 @@
-import { Typed } from "@core/base/utils/typed";
+import { Typed } from "@core/base/util/typed";
 import { ViewModel, ViewPolicy } from "@lib/core/pvi/types";
 
 export type ViewHook = <Model extends ViewModel, Context>(param: {

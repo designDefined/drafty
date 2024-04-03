@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Typed } from "@core/base/utils/typed";
+import { Typed } from "@core/base/util/typed";
 
 /* Primitives */
 const INTEGER_ID = z.number().int().nonnegative();
