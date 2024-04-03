@@ -1,5 +1,5 @@
 import { User } from "@core/base/entities/user";
-import PVI from "@lib/core/PVI";
+import PVI from "@lib/core/pvi";
 import { viewPolicy } from "@core/policy/view";
 
 const input = User.pick({ name: true });

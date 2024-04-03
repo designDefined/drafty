@@ -1,14 +1,10 @@
 import { ZodType } from "zod";
 import queryClient from "../adapter/react-query/queryClient";
-import { Intent, View, ViewModel } from "./types";
+import { Intent, ViewPolicyBuilder, ViewModel, ViewPolicy } from "./types";
 
-const view = <
-  Deps extends unknown[],
-  Model extends ViewModel,
-  Param extends View<Deps, Model>,
->(
-  param: Param,
-) => {
+const view = <Deps extends unknown[], Model extends ViewModel>(
+  param: ViewPolicyBuilder<Deps, Model>,
+): ViewPolicy<Deps, Model> => {
   const view = (...deps: Deps) => {
     const revalidate = () =>
       queryClient.invalidateQueries({

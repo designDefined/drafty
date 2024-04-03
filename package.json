@@ -1,18 +1,21 @@
 {
   "name": "recycle",
   "packageManager": "yarn@4.1.1",
-  "lint-staged": {
-    "vite/**/*.{js,jsx,ts,tsx}": [
-      "eslint --config vite/.eslintrc.cjs --fix",
-      "prettier --write -u"
-    ]
+  "scripts": {
+    "dialog": "yarn workspace dialog",
+    "mock": "yarn workspace mock",
+    "dev:dialog": "concurrently \"yarn workspace mock dialog\" \"yarn workspace dialog dev\""
   },
   "workspaces": [
-    "dialog"
+    "dialog",
+    "mock"
   ],
   "devDependencies": {
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
   }
 }

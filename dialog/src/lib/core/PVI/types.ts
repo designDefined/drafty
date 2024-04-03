@@ -1,16 +1,27 @@
 import { QueryKey, MutationKey } from "@tanstack/react-query";
 import { ZodType } from "zod";
-// import { policy } from "@core/policy";
 
 export type Key = QueryKey | MutationKey;
 
 export type ViewModel = ZodType;
-export type View<Deps extends unknown[], Model extends ViewModel> = (
+export type ViewPolicyBuilder<
+  Deps extends unknown[],
+  Model extends ViewModel,
+> = (...deps: Deps) => {
+  key: Key;
+  model: Model;
+};
+export type ViewPolicy<Deps extends unknown[], Model extends ViewModel> = (
   ...deps: Deps
 ) => {
   key: Key;
   model: Model;
+  revalidate: () => Promise<void>;
+  map: (mapFn: (prev: Model) => Model) => Promise<unknown>;
 };
+export type ViewPolicyReturn<Model extends ViewModel> = ReturnType<
+  ViewPolicy<[], Model>
+>;
 
 export type IntentModel<I extends ZodType, O extends ZodType> = {
   input: I;
