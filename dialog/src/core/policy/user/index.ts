@@ -8,8 +8,3 @@ export const userViewPolicy = {
 export const userIntentPolicy = {
   changeProfile: IPChangeProfile,
 };
-
-export const userPolicy = {
-  view: userViewPolicy,
-  intent: userIntentPolicy,
-};
