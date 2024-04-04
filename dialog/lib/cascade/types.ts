@@ -1,9 +1,11 @@
 export type StyleModule = { readonly [key: string]: string };
-export type StyleModuleRecord = Record<string, StyleModule>;
-export type StyleMapper = <T extends StyleModuleRecord>(modules: T) => string[];
+export type StyleModuleRecord = { readonly [key: string]: StyleModule };
+export type StyleMapper<T extends StyleModuleRecord> = (
+  modules: T,
+) => readonly string[] | string;
 
 export type CreateStyle = <Modules extends StyleModuleRecord>(
   modulesInput: Modules,
 ) => {
-  css: (mapper: StyleMapper) => string;
+  css: (mapper: StyleMapper<Modules>) => string;
 };

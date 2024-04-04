@@ -5,7 +5,7 @@ import { mapMessageDtoToMessage } from "./map";
 export const MessageRepository = {
   messages: () =>
     mockApi
-      .get("/messages")
+      .get("/messages?_sort=id&_order=desc")
       .then(delay())
       .then(error(0))
       .then(MessageDto.array().parse)

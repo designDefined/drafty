@@ -1,0 +1,15 @@
+.MessageList {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 24px;
+  overflow-x: visible;
+  overflow-y: scroll;
+}
+
+.item {
+  font-size: 16px;
+  color: rgba(var(--main-color), 0.8);
+  padding: 24px 16px;
+}

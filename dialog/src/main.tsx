@@ -10,8 +10,8 @@ import { RouterProvider } from "react-router-dom";
 import router from "./router";
 
 // global styles
-import "@style/global/reset.css";
-import "@style/global/font.css";
+import "@design/style/global/reset.css";
+import "@design/style/global/font.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>

@@ -1,6 +1,8 @@
 import { policy } from "@/core/policy";
 import { MessageRepository } from "@/core/repository/message";
 import { useIntent } from "@lib/pvi-react";
+import styles from "./MessageInput.module.css";
+import { css } from "@design/style";
 
 export default function MessageInput() {
   const {
@@ -14,6 +16,7 @@ export default function MessageInput() {
 
   return (
     <form
+      className={css(({ material }) => [material.glass, styles.MessageInput])}
       onSubmit={(e) => {
         e.preventDefault();
         if (isValid) submit();

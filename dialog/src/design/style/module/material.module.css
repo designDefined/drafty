@@ -1,0 +1,23 @@
+/* glassMorphism */
+.glass {
+  /* variables */
+  --main-color: 255, 255, 255;
+  --background-opacity: 0.3;
+  --border-opacity: 0.4;
+  --font-opacity: 0.8;
+  --border-radius: 16px;
+  --backdrop-filter-blur: 5px;
+
+  /* style */
+  color: rgba(var(--main-color), var(--font-opacity));
+  background-color: rgba(var(--main-color), var(--opacity));
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(var(--backdrop-filter-blur));
+  -webkit-backdrop-filter: blur(var(--backdrop-filter-blur));
+  border: 1px solid rgba(var(--main-color), var(--border-opacity));
+}
+.glassBlurry {
+}
+.glassClear {
+}

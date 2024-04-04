@@ -1,0 +1,25 @@
+.RootLayout {
+  padding: 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: linear-gradient(320deg, #f27121, #e94057, #8a2387);
+}
+
+.header {
+  flex: 0;
+  font-size: 32px;
+  background-color: rgba(100, 100, 100, 0.2);
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}

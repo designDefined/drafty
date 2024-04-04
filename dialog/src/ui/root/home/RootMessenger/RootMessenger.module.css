@@ -1,0 +1,9 @@
+.RootMessenger {
+  flex: 1 1 0;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 20px;
+  overflow: hidden;
+}
