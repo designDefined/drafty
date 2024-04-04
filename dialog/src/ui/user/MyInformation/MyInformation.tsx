@@ -1,5 +1,5 @@
-import { policy } from "@core/policy";
-import { UserRepository } from "@core/repository/user";
+import { policy } from "@/core/policy";
+import { UserRepository } from "@/core/repository/user";
 import { useView } from "@lib/pvi-react";
 
 export default function MyInformation() {

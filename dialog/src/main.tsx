@@ -11,6 +11,7 @@ import router from "./router";
 
 // global styles
 import "@style/global/reset.css";
+import "@style/global/font.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>

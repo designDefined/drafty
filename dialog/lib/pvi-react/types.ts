@@ -1,4 +1,4 @@
-import { Typed } from "@core/base/util/typed";
+import { Typed } from "@/core/base/util/typed";
 import { SuspenseQueryConfigs } from "@lib/core/adapter/react-query/configs";
 import { ZodAnyObject } from "@lib/core/adapter/zod/types";
 import {

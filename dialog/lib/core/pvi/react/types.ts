@@ -1,7 +1,7 @@
 import { QueryKey, MutationKey } from "@tanstack/react-query";
 import { ZodType } from "zod";
 import { ZodAnyObject } from "../../adapter/zod/types";
-import { Typed } from "@core/base/util/typed";
+import { Typed } from "@/core/base/util/typed";
 
 export type Key = QueryKey | MutationKey;
 

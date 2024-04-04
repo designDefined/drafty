@@ -1,5 +1,5 @@
-import { policy } from "@core/policy";
-import { MessageRepository } from "@core/repository/message";
+import { policy } from "@/core/policy";
+import { MessageRepository } from "@/core/repository/message";
 import { useView } from "@lib/pvi-react";
 
 export default function MessageList() {
