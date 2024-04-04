@@ -22,11 +22,12 @@
 
     /* Path alias */
     "paths": {
-      "@core/*": ["./src/core/*"],
-      "@lib/*": ["./src/lib/*"],
+      "@core/*": ["./core/*"],
+      "@lib/*": ["./lib/*"],
+      "@style/*": ["./design/style/*"],
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "core", "lib", "design/style"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
