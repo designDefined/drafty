@@ -1,6 +1,14 @@
 import { ZodType } from "zod";
 import queryClient from "../adapter/react-query/queryClient";
-import { Intent, ViewPolicyBuilder, ViewModel, ViewPolicy } from "./types";
+import {
+  ViewModel,
+  ViewPolicyBuilder,
+  ViewPolicy,
+  IntentModel,
+  IntentPolicyBuilder,
+  IntentPolicy,
+} from "./types";
+import { ZodAnyObject } from "../adapter/zod/types";
 
 const view = <Deps extends unknown[], Model extends ViewModel>(
   param: ViewPolicyBuilder<Deps, Model>,
@@ -19,9 +27,19 @@ const view = <Deps extends unknown[], Model extends ViewModel>(
   return view;
 };
 
-const intent = <Deps extends unknown[], I extends ZodType, O extends ZodType>(
-  param: Intent<Deps, I, O>,
-): Intent<Deps, I, O> => param;
+const intent = <
+  Deps extends unknown[],
+  I extends ZodAnyObject,
+  O extends ZodType,
+  Model extends IntentModel<I, O>,
+>(
+  param: IntentPolicyBuilder<Deps, I, O, Model>,
+): IntentPolicy<Deps, I, O, Model> => {
+  const intent = (...deps: Deps) => {
+    return param(...deps);
+  };
+  return intent;
+};
 
 const PVI = {
   view,

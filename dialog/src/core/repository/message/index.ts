@@ -10,4 +10,9 @@ export const MessageRepository = {
       .then(error(0))
       .then(MessageDto.array().parse)
       .then((data) => ({ data: data.map(mapMessageDtoToMessage) })),
+  sendMessage: (request: { text: string }) =>
+    mockApi
+      .post("/messages", { ...request, createTime: new Date() })
+      .then(MessageDto.parse)
+      .then(mapMessageDtoToMessage),
 };

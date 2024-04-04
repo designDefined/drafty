@@ -1,5 +1,7 @@
 import { QueryKey, MutationKey } from "@tanstack/react-query";
 import { ZodType } from "zod";
+import { ZodAnyObject } from "../adapter/zod/types";
+import { Typed } from "@core/base/util/typed";
 
 export type Key = QueryKey | MutationKey;
 
@@ -23,18 +25,35 @@ export type ViewPolicyReturn<Model extends ViewModel> = ReturnType<
   ViewPolicy<[], Model>
 >;
 
-export type IntentModel<I extends ZodType, O extends ZodType> = {
+export type IntentModel<I extends ZodAnyObject, O extends ZodType> = {
   input: I;
   output: O;
 };
-export type Intent<
+export type IntentPolicyBuilder<
   Deps extends unknown[],
-  I extends ZodType,
+  I extends ZodAnyObject,
   O extends ZodType,
-> = (deps: Deps) => {
+  Model extends IntentModel<I, O>,
+> = (...deps: Deps) => {
   key: Key;
-  model: IntentModel<I, O>;
-  connect?: (result: { deps: Deps; output: O }) => Promise<unknown>[];
+  model: Model;
+  connect?: (result: {
+    input: Typed<I>;
+    output: Typed<O>;
+  }) => Promise<unknown>[];
+};
+export type IntentPolicy<
+  Deps extends unknown[],
+  I extends ZodAnyObject,
+  O extends ZodType,
+  Model extends IntentModel<I, O>,
+> = (...deps: Deps) => {
+  key: Key;
+  model: Model;
+  connect?: (result: {
+    input: Typed<I>;
+    output: Typed<O>;
+  }) => Promise<unknown>[];
 };
 
 // export type Policy = typeof policy;
