@@ -1,5 +1,5 @@
 import { Message } from "@core/base/entity/message";
-import PVI from "@lib/core/pvi";
+import PVI from "@lib/core/pvi/react";
 
 export const VPMessages = PVI.view(() => ({
   key: ["message", "messages"],

@@ -4,7 +4,7 @@ import { SuspenseQueryConfigs } from "@lib/core/adapter/react-query/configs";
 import { useState } from "react";
 import { ZodAnyObject } from "@lib/core/adapter/zod/types";
 import { ZodType } from "zod";
-import { IntentModel } from "@lib/core/pvi/types";
+import { IntentModel } from "@lib/core/pvi/react/types";
 
 const defaultViewQueryConfigs: SuspenseQueryConfigs = {
   retry: 0,

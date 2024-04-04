@@ -1,5 +1,5 @@
 import { ZodType } from "zod";
-import queryClient from "../adapter/react-query/queryClient";
+import queryClient from "../../adapter/react-query/queryClient";
 import {
   ViewModel,
   ViewPolicyBuilder,
@@ -8,7 +8,7 @@ import {
   IntentPolicyBuilder,
   IntentPolicy,
 } from "./types";
-import { ZodAnyObject } from "../adapter/zod/types";
+import { ZodAnyObject } from "../../adapter/zod/types";
 
 const view = <Deps extends unknown[], Model extends ViewModel>(
   param: ViewPolicyBuilder<Deps, Model>,

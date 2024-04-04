@@ -6,7 +6,7 @@ import {
   IntentPolicy,
   ViewModel,
   ViewPolicy,
-} from "@lib/core/pvi/types";
+} from "@lib/core/pvi/react/types";
 import { ZodType } from "zod";
 
 export type ViewHook = <Model extends ViewModel, Context>(param: {
