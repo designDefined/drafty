@@ -1,4 +1,4 @@
-import MessageLayout from "@/ui/message/layout";
+import MessageLayout from "@/ui/root/layout";
 import { RouteObject } from "react-router-dom";
 
 export const messageRoutes: RouteObject[] = [

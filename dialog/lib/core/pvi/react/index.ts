@@ -20,7 +20,15 @@ const view = <Deps extends unknown[], Model extends ViewModel>(
       });
 
     const map = (mapFn: (prev: Model) => Model) =>
-      Promise.resolve(queryClient.setQueryData(param(...deps).key, mapFn));
+      Promise.resolve(
+        queryClient.setQueryData(
+          param(...deps).key,
+          (prev: { data: Model }) => ({
+            ...prev,
+            data: mapFn(prev.data),
+          }),
+        ),
+      );
 
     return { ...param(...deps), revalidate, map };
   };
@@ -29,12 +37,10 @@ const view = <Deps extends unknown[], Model extends ViewModel>(
 
 const intent = <
   Deps extends unknown[],
-  I extends ZodAnyObject,
-  O extends ZodType,
-  Model extends IntentModel<I, O>,
+  Model extends IntentModel<ZodAnyObject, ZodType>,
 >(
-  param: IntentPolicyBuilder<Deps, I, O, Model>,
-): IntentPolicy<Deps, I, O, Model> => {
+  param: IntentPolicyBuilder<Deps, Model>,
+): IntentPolicy<Deps, Model> => {
   const intent = (...deps: Deps) => {
     return param(...deps);
   };

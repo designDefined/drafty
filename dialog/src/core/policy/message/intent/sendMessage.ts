@@ -8,5 +8,7 @@ const output = Message;
 export const IPSendMessage = PVI.intent(() => ({
   key: ["message", "sendMessage"],
   model: { input, output },
-  connect: () => [viewPolicy.message.messages().revalidate()],
+  connect: ({ output }) => [
+    viewPolicy.message.messages().map((prev) => [output, ...prev]),
+  ],
 }));

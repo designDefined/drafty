@@ -9,28 +9,56 @@ import {
 } from "@lib/core/pvi/react/types";
 import { ZodType } from "zod";
 
-export type ViewHook = <Model extends ViewModel, Context>(param: {
+/*
+ * View
+ */
+
+export type ViewHookParam<Model extends ViewModel> = {
   policy: ReturnType<ViewPolicy<[], Model>>;
-  repository: () => Promise<{ data: Typed<Model>; context?: Context }>;
+  repository: () => Promise<{
+    data: Typed<Model>;
+    context?: unknown;
+  }>;
   queryOptions?: SuspenseQueryConfigs;
-}) => { data: Typed<Model>; context?: Context; isUpdating: boolean };
-
-export type IntentHookParam<
-  I extends ZodAnyObject,
-  O extends ZodType,
-  Model extends IntentModel<I, O>,
-> = {
-  policy: ReturnType<IntentPolicy<[], I, O, Model>>;
-  repository: (input: Typed<Model["input"]>) => Promise<Typed<Model["output"]>>;
-  placeholder?: Partial<Typed<I>>;
 };
 
-export type IntentHookReturn<
-  I extends ZodAnyObject,
-  O extends ZodType,
-  Model extends IntentModel<I, O>,
-> = {
-  input: { value: Partial<Typed<I>>; set: (value: Partial<Typed<I>>) => void };
-  submit: () => Promise<Typed<Model["output"]>>;
-  isValid: boolean;
+export type ViewHookReturn<Model extends ViewModel, Context> = {
+  data: Typed<Model>;
+  context?: Context;
+  isUpdating: boolean;
 };
+
+export type LocalViewHookParam<Model extends ViewModel> = {
+  policy: ReturnType<ViewPolicy<[], Model>>;
+  initialData: Typed<Model>;
+  queryOptions?: SuspenseQueryConfigs;
+};
+
+export type LocalViewHookReturn<Model extends ViewModel, Context> = {
+  data: Typed<Model>;
+  context?: Context;
+};
+
+/*
+ * Intent
+ */
+
+export type IntentHookParam<Model extends IntentModel<ZodAnyObject, ZodType>> =
+  {
+    policy: ReturnType<IntentPolicy<[], Model>>;
+    repository: (
+      input: Typed<Model["input"]>,
+    ) => Promise<Typed<Model["output"]>>;
+    placeholder?: Partial<Typed<Model["input"]>>;
+  };
+
+export type IntentHookReturn<Model extends IntentModel<ZodAnyObject, ZodType>> =
+  {
+    input: {
+      value: Partial<Typed<Model["input"]>>;
+      set: (value: Partial<Typed<Model["input"]>>) => void;
+    };
+    submit: () => Promise<Typed<Model["output"]>>;
+    send: (request: Typed<Model["input"]>) => Promise<Typed<Model["output"]>>;
+    isValid: boolean;
+  };

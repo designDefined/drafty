@@ -7,11 +7,15 @@ import { css } from "@design/style";
 export default function MessageInput() {
   const {
     input: { value, set },
-    submit,
+    submit: sendMessage,
     isValid,
   } = useIntent({
     policy: policy.message.intent.sendMessage(),
     repository: MessageRepository.sendMessage,
+  });
+  const { send: pendMessage } = useIntent({
+    policy: policy.message.intent.pendMessage(),
+    repository: async (input) => input,
   });
 
   return (
@@ -19,13 +23,18 @@ export default function MessageInput() {
       className={css(({ material }) => [material.glass, styles.MessageInput])}
       onSubmit={(e) => {
         e.preventDefault();
-        if (isValid) submit();
+        if (isValid) {
+          const fake = { id: Date.now().toString(), text: value.text ?? "" };
+          pendMessage({ ...fake, isResolve: false })
+            .then(() => sendMessage())
+            .finally(() => pendMessage({ ...fake, isResolve: true }));
+        }
       }}
     >
       메시지 작성:{" "}
       <input
         type="text"
-        value={value.text}
+        value={value.text ?? ""}
         onChange={(e) => set({ text: e.target.value })}
       />
     </form>

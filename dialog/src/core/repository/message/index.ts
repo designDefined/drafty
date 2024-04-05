@@ -13,6 +13,7 @@ export const MessageRepository = {
   sendMessage: (request: { text: string }) =>
     mockApi
       .post("/messages", { ...request, createTime: new Date() })
+      .then(delay())
       .then(MessageDto.parse)
       .then(mapMessageDtoToMessage),
 };
