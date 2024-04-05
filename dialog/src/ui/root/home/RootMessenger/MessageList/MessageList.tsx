@@ -3,8 +3,10 @@ import { MessageRepository } from "@/core/repository/message";
 import { useLocalView, useView } from "@lib/pvi-react";
 import styles from "./MessageList.module.css";
 import { css } from "@design/style";
+import { useNavigate } from "react-router-dom";
 
 export default function MessageList() {
+  const navigate = useNavigate();
   const { data: messages } = useView({
     policy: policy.message.view.messages(),
     repository: MessageRepository.messages,
@@ -32,6 +34,7 @@ export default function MessageList() {
         <div
           className={css(({ material }) => [material.glass, styles.item])}
           key={id}
+          onClick={() => navigate(`/message/${id}`)}
         >
           {text}
           <div className={css(() => styles.date)}>{createTime}</div>

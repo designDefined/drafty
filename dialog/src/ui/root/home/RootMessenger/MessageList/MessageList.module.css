@@ -14,6 +14,12 @@
   color: rgba(var(--main-color), 0.8);
   padding: 24px 16px;
   animation: resolve 0.4s;
+  transition: 0.1s ease;
+  cursor: pointer;
+}
+
+.MessageList .item:hover {
+  transform: translateX(10px);
 }
 
 .MessageList .item.isPending {
