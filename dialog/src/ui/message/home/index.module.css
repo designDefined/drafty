@@ -1,0 +1,22 @@
+.MessageHome {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.MessageHome .time {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.MessageHome .divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(var(--main-color), 0.8);
+}
+
+.MessageHome .content {
+  font-size: 24px;
+}

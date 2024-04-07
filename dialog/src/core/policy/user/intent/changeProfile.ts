@@ -1,12 +1,11 @@
 import { User } from "@/core/base/entity/user";
-import { viewPolicy } from "@/core/policy";
-import PVI from "@lib/core/pvi/react";
+import { IP } from "@core/policy/intentPolicyFactory";
 
 const input = User.pick({ name: true });
 const output = User;
 
-export const IPChangeProfile = PVI.intent(() => ({
+export const IPChangeProfile = IP(() => ({
   key: ["user", "changeProfile"],
   model: { input, output },
-  connect: () => [viewPolicy.user.me().revalidate()],
+  connect: ({ view }) => [view.user.me().invalidate()],
 }));

@@ -1,7 +1,7 @@
+import { VP } from "@core/policy/viewPolicyFactory";
 import { FakeMessage } from "@/core/base/entity/message";
-import PVI from "@lib/core/pvi/react";
 
-export const VPPendingMessages = PVI.view(() => ({
+export const VPPendingMessages = VP(() => ({
   key: ["message", "messages", "pending"],
   model: FakeMessage.array(),
 }));

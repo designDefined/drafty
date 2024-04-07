@@ -1,20 +1,20 @@
-import { policy } from "@/core/policy";
+import { useStaticView, useView } from "@core/policy";
+
 import { MessageRepository } from "@/core/repository/message";
-import { useLocalView, useView } from "@lib/pvi-react";
 import styles from "./MessageList.module.css";
 import { css } from "@design/style";
 import { useNavigate } from "react-router-dom";
 
 export default function MessageList() {
   const navigate = useNavigate();
-  const { data: messages } = useView({
-    policy: policy.message.view.messages(),
+  const { data: messages } = useView((view) => ({
+    policy: view.message.messages(),
     repository: MessageRepository.messages,
-  });
-  const { data: pendingMessages } = useLocalView({
-    policy: policy.message.view.pendingMessages(),
-    initialData: [],
-  });
+  }));
+  const { data: pendingMessages } = useStaticView((view) => ({
+    policy: view.message.pendingMessages(),
+    initialData: { data: [] },
+  }));
 
   return (
     <ul className={css(() => [styles.MessageList])}>

@@ -1,0 +1,10 @@
+.MessageLayout {
+  width: 400px;
+}
+
+.MessageLayout .loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 42px 0;
+}

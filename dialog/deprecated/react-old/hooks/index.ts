@@ -4,14 +4,14 @@ import {
   IntentHookParam,
   ViewHookParam,
   ViewHookReturn,
-  LocalViewHookParam,
-  LocalViewHookReturn,
+  StaticViewHookParam,
+  StaticViewHookReturn,
 } from "./types";
 import { SuspenseQueryConfigs } from "@lib/core/adapter/react-query/configs";
 import { useState } from "react";
 import { ZodAnyObject } from "@lib/core/adapter/zod/types";
 import { ZodType } from "zod";
-import { IntentModel, ViewModel } from "@lib/core/pvi/react/types";
+import { IntentModel, ViewModel } from "@lib/core/pvi/react/core/types";
 import { Typed } from "@core/base/util/typed";
 
 const defaultViewQueryConfigs: SuspenseQueryConfigs = {
@@ -26,21 +26,21 @@ const defaultLocalViewQueryConfigs: SuspenseQueryConfigs = {
   gcTime: Infinity,
 };
 
-export const useView = <Model extends ViewModel, Context = undefined>({
+export const useView = <Model extends ViewModel>({
   policy,
   repository,
   queryOptions,
-}: ViewHookParam<Model>): ViewHookReturn<Model, Context> => {
+}: ViewHookParam<Model>): ViewHookReturn<Model> => {
   const { data, isFetching } = useSuspenseQuery<{
     data: Typed<Model>;
-    context: Context;
+    context: unknown;
   }>({
     queryKey: policy.key,
     queryFn: async () => {
       try {
         const { data, context } = await repository();
         const parsedData = policy.model.parse(data);
-        return { data: parsedData, context: context as Context };
+        return { data: parsedData, context };
       } catch (e) {
         return Promise.reject(e);
       }
@@ -51,17 +51,17 @@ export const useView = <Model extends ViewModel, Context = undefined>({
   return { ...data, isUpdating: isFetching };
 };
 
-export const useLocalView = <Model extends ViewModel, Context = undefined>({
+export const useStaticView = <Model extends ViewModel>({
   policy,
   initialData,
   queryOptions,
-}: LocalViewHookParam<Model>): LocalViewHookReturn<Model, Context> => {
+}: StaticViewHookParam<Model>): StaticViewHookReturn<Model> => {
   const { data } = useSuspenseQuery<{
     data: Typed<Model>;
-    context: Context;
+    context: unknown;
   }>({
     queryKey: policy.key,
-    initialData: { data: initialData, context: null as Context },
+    initialData: { data: initialData.data, context: initialData.context },
     ...defaultLocalViewQueryConfigs,
     ...queryOptions,
   });

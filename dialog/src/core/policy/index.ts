@@ -1,17 +1,8 @@
-import { messageIntentPolicy, messageViewPolicy } from "./message";
-import { userIntentPolicy, userViewPolicy } from "./user";
+import PVI from "@lib/core/pvi/react";
+import { intentPolicy } from "./intentPolicy";
+import { viewPolicy } from "./viewPolicy";
 
-export const viewPolicy = {
-  user: userViewPolicy,
-  message: messageViewPolicy,
-};
+export const { useView, useStaticView } = PVI.createViewHooks(viewPolicy);
+export const { useIntent } = PVI.createIntentHooks(intentPolicy);
 
-export const intentPolicy = {
-  user: userIntentPolicy,
-  message: messageIntentPolicy,
-};
-
-export const policy = {
-  user: { view: userViewPolicy, intent: userIntentPolicy },
-  message: { view: messageViewPolicy, intent: messageIntentPolicy },
-};
+export const policy = { view: viewPolicy, intent: intentPolicy };

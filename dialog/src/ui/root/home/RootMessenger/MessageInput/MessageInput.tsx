@@ -1,6 +1,5 @@
-import { policy } from "@/core/policy";
+import { useIntent } from "@/core/policy";
 import { MessageRepository } from "@/core/repository/message";
-import { useIntent } from "@lib/pvi-react";
 import styles from "./MessageInput.module.css";
 import { css } from "@design/style";
 
@@ -9,14 +8,14 @@ export default function MessageInput() {
     input: { value, set },
     submit: sendMessage,
     isValid,
-  } = useIntent({
-    policy: policy.message.intent.sendMessage(),
+  } = useIntent((intent) => ({
+    policy: intent.message.sendMessage(),
     repository: MessageRepository.sendMessage,
-  });
-  const { send: pendMessage } = useIntent({
-    policy: policy.message.intent.pendMessage(),
+  }));
+  const { send: pendMessage } = useIntent((intent) => ({
+    policy: intent.message.pendMessage(),
     repository: async (input) => input,
-  });
+  }));
 
   return (
     <form

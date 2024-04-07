@@ -1,14 +1,13 @@
+import { IP } from "@core/policy/intentPolicyFactory";
 import { Message } from "@/core/base/entity/message";
-import { viewPolicy } from "@/core/policy";
-import PVI from "@lib/core/pvi/react";
 
 const input = Message.pick({ text: true });
 const output = Message;
 
-export const IPSendMessage = PVI.intent(() => ({
+export const IPSendMessage = IP(() => ({
   key: ["message", "sendMessage"],
   model: { input, output },
-  connect: ({ output }) => [
-    viewPolicy.message.messages().map((prev) => [output, ...prev]),
+  connect: ({ view, output }) => [
+    view.message.messages().map((prev) => [output, ...prev]),
   ],
 }));

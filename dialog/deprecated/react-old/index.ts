@@ -1,11 +1,9 @@
 import { createIntentPolicyFactory, createViewPolicyFactory } from "./core";
-import { createIntentHooks, createViewHooks } from "./hooks";
+import { useView, useStaticView, useIntent } from "./hooks";
 
 const PVI = {
   createViewPolicyFactory,
   createIntentPolicyFactory,
-  createViewHooks,
-  createIntentHooks,
 };
 
-export default PVI;
+export { PVI, useView, useStaticView, useIntent };

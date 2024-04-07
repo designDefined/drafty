@@ -1,19 +1,18 @@
 import { FakeMessage } from "@/core/base/entity/message";
-import { viewPolicy } from "@core/policy";
-import PVI from "@lib/core/pvi/react";
+import { IP } from "@core/policy/intentPolicyFactory";
 import { z } from "zod";
 
 const model = FakeMessage.extend({ isResolve: z.boolean() });
 
-export const IPPendMessage = PVI.intent(() => ({
+export const IPPendMessage = IP(() => ({
   key: ["message", "pendMessage"],
   model: { input: model, output: model },
-  connect: ({ output }) =>
+  connect: ({ view, output }) =>
     output.isResolve
       ? [
-          viewPolicy.message
+          view.message
             .pendingMessages()
             .map((prev) => prev.filter((message) => message.id !== output.id)),
         ]
-      : [viewPolicy.message.pendingMessages().map((prev) => [output, ...prev])],
+      : [view.message.pendingMessages().map((prev) => [output, ...prev])],
 }));

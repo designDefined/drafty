@@ -29,5 +29,6 @@
     }
   },
   "include": ["lib", "src"],
+  "exclude": ["deprecated/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

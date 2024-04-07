@@ -1,7 +1,7 @@
+import { VP } from "@core/policy/viewPolicyFactory";
 import { Message } from "@/core/base/entity/message";
-import PVI from "@lib/core/pvi/react";
 
-export const VPMessages = PVI.view(() => ({
+export const VPMessages = VP(() => ({
   key: ["message", "messages"],
   model: Message.array(),
 }));

@@ -1,15 +1,22 @@
-import { policy } from "@core/policy";
-import { MessageRepository } from "@core/repository/message";
-import { useView } from "@lib/pvi-react";
-import { useParams } from "react-router-dom";
+import { Suspense } from "react";
+import { Outlet } from "react-router-dom";
+import styles from "./index.module.css";
+import { css } from "@design/style";
 
 export default function MessageLayout() {
-  const params = useParams();
-  if (!params.messageId) throw new Error("Message ID is required");
-  const { data: message } = useView({
-    policy: policy.message.view.message(Number(params.messageId)),
-    repository: () => MessageRepository.message(Number(params.messageId)),
-  });
-
-  return <div>{message.text}</div>;
+  return (
+    <div className={css(() => styles.MessageLayout)}>
+      <Suspense
+        fallback={
+          <div
+            className={css(({ material }) => [material.glass, styles.loader])}
+          >
+            메시지 로딩 중
+          </div>
+        }
+      >
+        <Outlet />
+      </Suspense>
+    </div>
+  );
 }
