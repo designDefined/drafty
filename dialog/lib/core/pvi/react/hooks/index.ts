@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
   IntentHookReturn,
   IntentHookParam,
@@ -6,13 +6,14 @@ import {
   ViewHookReturn,
   StaticViewHookParam,
   StaticViewHookReturn,
+  ViewStateHookParam,
+  ViewStateHookReturn,
 } from "./types";
 import { SuspenseQueryConfigs } from "@lib/core/adapter/react-query/configs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ZodAnyObject } from "@lib/core/adapter/zod/types";
-import { ZodType } from "zod";
+import { TypeOf, ZodType } from "zod";
 import { IntentModel, ViewModel } from "@lib/core/pvi/react/core/types";
-import { Typed } from "@core/base/util/typed";
 import { AnyIntentPolicyRecords, AnyViewPolicyRecords } from "../core/typesAny";
 
 const defaultViewQueryConfigs: SuspenseQueryConfigs = {
@@ -36,7 +37,7 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
   ): ViewHookReturn<Model> => {
     const { policy, repository, queryOptions } = param(recordsCache);
     const { data, isFetching } = useSuspenseQuery<{
-      data: Typed<Model>;
+      data: TypeOf<Model>;
       context: unknown;
     }>({
       queryKey: policy.key,
@@ -60,7 +61,7 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
   ): StaticViewHookReturn<Model> => {
     const { policy, initialData, queryOptions } = param(recordsCache);
     const { data } = useSuspenseQuery<{
-      data: Typed<Model>;
+      data: TypeOf<Model>;
       context: unknown;
     }>({
       queryKey: policy.key,
@@ -71,7 +72,75 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
     return { ...data };
   };
 
-  return { useView, useStaticView };
+  const useViewState = <Model extends ViewModel>(
+    param: ViewStateHookParam<Records, Model>,
+  ): ViewStateHookReturn<Model> => {
+    const { policy, repository, queryOptions } = param(recordsCache);
+    const { data, error, isSuccess, isError, isFetching } = useQuery<{
+      data: TypeOf<Model>;
+      context: unknown;
+    }>({
+      queryKey: policy.key,
+      queryFn: async () => {
+        try {
+          const { data, context } = await repository();
+          const parsedData = policy.model.parse(data);
+          return { data: parsedData, context };
+        } catch (e) {
+          return Promise.reject(e);
+        }
+      },
+      ...defaultViewQueryConfigs,
+      ...queryOptions,
+    });
+
+    const state: ViewStateHookReturn<Model> = useMemo(() => {
+      if (isError)
+        return {
+          status: "FAIL",
+          data: null,
+          error,
+          isLoaded: false,
+          isFetching: false,
+        };
+      if (isSuccess) {
+        if (isFetching)
+          return {
+            status: "UPDATING",
+            data,
+            error: null,
+            isLoaded: true,
+            isFetching: true,
+          };
+        return {
+          status: "SUCCESS",
+          data,
+          error: null,
+          isLoaded: true,
+          isFetching: false,
+        };
+      }
+      if (isFetching)
+        return {
+          status: "LOADING",
+          data: null,
+          error: null,
+          isFetching: true,
+          isLoaded: false,
+        };
+      return {
+        status: "IDLE",
+        data: null,
+        error: null,
+        isFetching: false,
+        isLoaded: false,
+      };
+    }, [isError, isSuccess, isFetching, data, error]);
+
+    return state;
+  };
+
+  return { useView, useStaticView, useViewState };
 };
 
 const createIntentHooks = <Records extends AnyIntentPolicyRecords>(
