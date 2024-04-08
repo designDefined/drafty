@@ -1,15 +1,15 @@
 import styles from "./index.module.css";
 import { cssNamed } from "@design/style";
 import { ButtonDefaultProps } from "./types";
-import { CustomStyle } from "@lib/cascade";
+import { StyleProps } from "@design/component/types";
 
 const { merge } = cssNamed("root");
 
 function Default({
-  customStyle = {},
+  customStyle,
   children,
   ...props
-}: ButtonDefaultProps & { customStyle?: CustomStyle<typeof merge> }) {
+}: ButtonDefaultProps & StyleProps<typeof merge>) {
   const css = merge(customStyle);
   return (
     <button
@@ -25,4 +25,5 @@ function Default({
 }
 
 const Button = { Default };
+
 export default Button;

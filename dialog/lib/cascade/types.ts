@@ -17,7 +17,7 @@ export type MergeStyle<
   Names extends readonly string[],
   Namespace extends Record<Names[number], Css<Modules>>,
 > = (
-  mapperRecord: Partial<Record<keyof Namespace, StyleMapper<Modules>>>,
+  mapperRecord?: Partial<Record<keyof Namespace, StyleMapper<Modules>>>,
 ) => Record<keyof Namespace, Css<Modules>>;
 
 export type CssNamed<Modules extends StyleModuleRecord> = <
@@ -28,10 +28,6 @@ export type CssNamed<Modules extends StyleModuleRecord> = <
 ) => {
   merge: MergeStyle<Modules, Names, Namespace>;
 };
-
-export type CustomStyle<
-  T extends MergeStyle<StyleModuleRecord, [], Record<string, unknown>>,
-> = Parameters<T>[0];
 
 export type CreateStyleReturn<Modules extends StyleModuleRecord> = {
   commonStyles: Modules;

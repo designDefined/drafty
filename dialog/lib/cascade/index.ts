@@ -2,7 +2,6 @@ import {
   CreateStyleReturn,
   Css,
   CssNamed,
-  CustomStyle,
   StyleMapper,
   StyleModuleRecord,
 } from "./types";
@@ -29,12 +28,12 @@ const createStyle = <Modules extends StyleModuleRecord>(
     ...names: Names
   ) => {
     const merge = (
-      mapperRecord: Partial<Record<keyof Namespace, StyleMapper<Modules>>>,
+      mapperRecord?: Partial<Record<keyof Namespace, StyleMapper<Modules>>>,
     ) => {
       const result: Namespace = {} as Namespace;
       for (const key of names) {
         const validKey = key as keyof Namespace;
-        const mapper = mapperRecord[validKey];
+        const mapper = mapperRecord && mapperRecord[validKey];
         const mapped: string = mapper
           ? parseToString(mapper(commonStyles))
           : "";
@@ -54,4 +53,4 @@ const createStyle = <Modules extends StyleModuleRecord>(
 };
 
 export { createStyle };
-export type { StyleModule, CustomStyle };
+export type { StyleModule };
