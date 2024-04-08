@@ -1,10 +1,24 @@
-import { css } from "@design/style";
 import styles from "./index.module.css";
+import { cssNamed } from "@design/style";
 import { ButtonDefaultProps } from "./types";
+import { CustomStyle } from "@lib/cascade";
 
-function Default({ children }: ButtonDefaultProps) {
+const { merge } = cssNamed("root");
+
+function Default({
+  customStyle = {},
+  children,
+  ...props
+}: ButtonDefaultProps & { customStyle?: CustomStyle<typeof merge> }) {
+  const css = merge(customStyle);
   return (
-    <button className={css(({ material }) => [styles.root, material.glass])}>
+    <button
+      className={css.root(({ material }) => [
+        material.glass,
+        styles.ButtonDefault,
+      ])}
+      {...props}
+    >
       {children}
     </button>
   );

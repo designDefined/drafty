@@ -2,6 +2,7 @@ import { useIntent } from "@/core/policy";
 import { MessageRepository } from "@/core/repository/message";
 import styles from "./MessageInput.module.css";
 import { css } from "@design/style";
+import Button from "@design/component/buttons/Button";
 
 export default function MessageInput() {
   const {
@@ -36,6 +37,14 @@ export default function MessageInput() {
         value={value.text ?? ""}
         onChange={(e) => set({ text: e.target.value })}
       />
+      <Button.Default
+        type="submit"
+        customStyle={{
+          root: ({ material }) => [material.glass, styles.sendButton],
+        }}
+      >
+        전송
+      </Button.Default>
     </form>
   );
 }

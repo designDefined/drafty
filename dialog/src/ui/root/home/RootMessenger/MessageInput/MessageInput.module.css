@@ -1,4 +1,13 @@
 .MessageInput {
   flex: 0;
-  padding: 10px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.MessageInput .sendButton {
+  position: absolute;
+  right: 20px;
+  background-color: red;
 }
