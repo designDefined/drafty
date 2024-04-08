@@ -626,6 +626,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pvi/react@workspace:^, @pvi/react@workspace:library/pvi/react":
+  version: 0.0.0-use.local
+  resolution: "@pvi/react@workspace:library/pvi/react"
+  peerDependencies:
+    "@tanstack/react-query": ^5.14.1
+    react: ^18.2.0
+  languageName: unknown
+  linkType: soft
+
 "@remix-run/router@npm:1.15.3":
   version: 1.15.3
   resolution: "@remix-run/router@npm:1.15.3"
@@ -1254,6 +1263,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cascade@workspace:^, cascade@workspace:library/cascade":
+  version: 0.0.0-use.local
+  resolution: "cascade@workspace:library/cascade"
+  languageName: unknown
+  linkType: soft
+
 "chalk@npm:^2.4.2":
   version: 2.4.2
   resolution: "chalk@npm:2.4.2"
@@ -1526,19 +1541,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dialog@workspace:dialog":
+"dialog@workspace:project/dialog":
   version: 0.0.0-use.local
-  resolution: "dialog@workspace:dialog"
+  resolution: "dialog@workspace:project/dialog"
   dependencies:
+    "@pvi/react": "workspace:^"
     "@tanstack/react-query": "npm:^5.28.9"
     "@types/react": "npm:^18.2.66"
     "@types/react-dom": "npm:^18.2.22"
     "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
     "@typescript-eslint/parser": "npm:^7.2.0"
     "@vitejs/plugin-react": "npm:^4.2.1"
+    cascade: "workspace:^"
     eslint: "npm:^8.57.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.6"
+    fetch: "workspace:^"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-error-boundary: "npm:^4.0.13"
@@ -1998,6 +2016,12 @@ __metadata:
   checksum: 10c0/1095f16cea45fb3beff558bb3afa74ca7a9250f5a670b65db7ed585f92b4b48381445cd328b3d87323da81e43232b5d5978a8201bde84e0cd514310f1ea6da34
   languageName: node
   linkType: hard
+
+"fetch@workspace:^, fetch@workspace:library/fetch":
+  version: 0.0.0-use.local
+  resolution: "fetch@workspace:library/fetch"
+  languageName: unknown
+  linkType: soft
 
 "file-entry-cache@npm:^6.0.1":
   version: 6.0.1

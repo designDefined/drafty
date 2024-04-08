@@ -4,10 +4,11 @@
   "scripts": {
     "dialog": "yarn workspace dialog",
     "mock": "yarn workspace mock",
-    "dev:dialog": "concurrently \"yarn workspace mock dialog\" \"yarn workspace dialog dev\""
+    "dev:dialog": "concurrently \"yarn mock dialog\" \"yarn dialog dev\""
   },
   "workspaces": [
-    "dialog",
+    "library/**/*",
+    "project/**/*",
     "mock"
   ],
   "devDependencies": {
