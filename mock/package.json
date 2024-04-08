@@ -2,9 +2,11 @@
   "name": "mock",
   "packageManager": "yarn@4.1.1",
   "scripts": {
+    "initialize": "cpy ./dialog/init.json ./ --rename=db.json",
     "dialog": "yarn json-server --watch ./dialog/db.json --port 3001"
   },
   "dependencies": {
+    "cpy-cli": "^5.0.0",
     "json-server": "^0.17.4"
   }
 }

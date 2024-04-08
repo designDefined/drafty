@@ -1,9 +1,10 @@
 {
-  "name": "recycle",
+  "name": "pvi-samples",
   "packageManager": "yarn@4.1.1",
   "scripts": {
     "dialog": "yarn workspace dialog",
     "mock": "yarn workspace mock",
+    "initialize-db": "yarn mock initialize",
     "dev:dialog": "concurrently \"yarn mock dialog\" \"yarn dialog dev\""
   },
   "workspaces": [
