@@ -7,7 +7,7 @@ type Modules = {
   material: StyleModule<"glass" | "glassClear" | "glassBlurry">;
 };
 
-export const { css, cssNamed } = createStyle<Modules>({
+export const { css, cssNamed, bindStyle } = createStyle<Modules>({
   layout,
   material,
 });

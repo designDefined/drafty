@@ -1,4 +1,5 @@
 import {
+  BindStyle,
   CreateStyleReturn,
   Css,
   CssNamed,
@@ -11,6 +12,10 @@ const createStyle = <Modules extends StyleModuleRecord>(
   modules: StyleModuleRecord,
 ): CreateStyleReturn<Modules> => {
   const commonStyles = modules as Modules;
+  const flattenedStyle = Object.values(modules).reduce((a, b) => ({
+    ...a,
+    ...b,
+  }));
 
   const parseToString = (result: ReturnType<StyleMapper<Modules>>): string => {
     if (typeof result === "string") return result;
@@ -49,7 +54,20 @@ const createStyle = <Modules extends StyleModuleRecord>(
     return { merge };
   };
 
-  return { commonStyles, css, cssNamed };
+  const bindStyle: BindStyle<Modules> =
+    (localModule) =>
+    (...names) => {
+      const reduced = names.reduce<string[]>((a, b) => {
+        if (!b) return a;
+        if (localModule && localModule[b]) return [...a, localModule[b]];
+        if (flattenedStyle[b as keyof typeof flattenedStyle])
+          return [...a, flattenedStyle[b as keyof typeof flattenedStyle]];
+        return [...a, b.toString()];
+      }, []);
+      return parseToString(reduced);
+    };
+
+  return { commonStyles, css, cssNamed, bindStyle };
 };
 
 export { createStyle };
