@@ -11,5 +11,3 @@ export const {
   intentPolicy,
   queryClient,
 });
-
-console.log(policy);
