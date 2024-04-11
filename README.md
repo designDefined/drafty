@@ -34,7 +34,7 @@ yarn dev:프로젝트명
 
 ### 아키텍쳐에 대해 궁금하다면
 
-아래 Library List 중에서 호기심이 가는 라이브러리의 `README.md`를 읽어보세요! 모든 라이브러리에는 README가 자세하게 작성되어 있습니다. 가장 핵심적인 라이브러리는 [PVI-React](./library/pvi/react/README.md)입니다.
+아래 Library List 중에서 호기심이 가는 라이브러리의 `README.md`를 읽어보세요! 모든 라이브러리에는 README가 자세하게 작성되어 있습니다. 가장 핵심적인 라이브러리는 [PVI-React](./library/pvi/README.md)입니다.
 
 ## Library List
 
