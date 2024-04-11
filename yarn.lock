@@ -626,10 +626,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pvi/core@workspace:^, @pvi/core@workspace:library/pvi/core":
+  version: 0.0.0-use.local
+  resolution: "@pvi/core@workspace:library/pvi/core"
+  dependencies:
+    zod: "npm:^3.22.4"
+  languageName: unknown
+  linkType: soft
+
 "@pvi/react@workspace:^, @pvi/react@workspace:library/pvi/react":
   version: 0.0.0-use.local
   resolution: "@pvi/react@workspace:library/pvi/react"
   peerDependencies:
+    "@pvi/core": "workspace:^"
     "@tanstack/react-query": ^5.14.1
     react: ^18.2.0
   languageName: unknown
@@ -1610,6 +1619,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "dialog@workspace:project/dialog"
   dependencies:
+    "@pvi/core": "workspace:^"
     "@pvi/react": "workspace:^"
     "@tanstack/react-query": "npm:^5.28.9"
     "@types/react": "npm:^18.2.66"

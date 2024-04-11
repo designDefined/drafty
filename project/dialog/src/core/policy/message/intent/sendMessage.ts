@@ -7,7 +7,7 @@ const output = Message;
 export const IPSendMessage = IP(() => ({
   key: ["message", "sendMessage"],
   model: { input, output },
-  connect: ({ view, output }) => [
+  connect: (view, { output }) => [
     view.message.messages().map((prev) => [output, ...prev]),
   ],
 }));

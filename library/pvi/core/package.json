@@ -1,0 +1,9 @@
+{
+  "name": "@pvi/core",
+  "version:": "0.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}

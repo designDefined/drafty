@@ -2,15 +2,20 @@ import {
   QueryConfigs,
   SuspenseQueryConfigs,
 } from "../adapter/react-query/configs";
-import { ZodAnyObject } from "../adapter/zod/types";
+import { ZodAnyObject } from "../../core/adapter/zod/types";
+import { ViewModel, ViewPolicy, ViewPolicyRecords } from "@pvi/core/types/view";
 import {
   IntentModel,
   IntentPolicy,
-  ViewModel,
-  ViewPolicy,
-} from "../core/types";
-import { AnyViewPolicyRecords, AnyIntentPolicyRecords } from "../core/typesAny";
+  IntentPolicyRecords,
+} from "@pvi/core/types/intent";
+
 import { TypeOf, ZodType } from "zod";
+import { ViewStateEnum } from "./stateEnum";
+import {
+  AnyIntentPolicyDraftRecords,
+  AnyViewPolicyDraftRecords,
+} from "@pvi/core/types/typesAny";
 
 /*
  * View
@@ -18,7 +23,7 @@ import { TypeOf, ZodType } from "zod";
 
 // useView
 export type ViewHookParam<
-  Records extends AnyViewPolicyRecords,
+  Records extends ViewPolicyRecords<AnyViewPolicyDraftRecords>,
   Model extends ViewModel,
 > = (view: Records) => {
   policy: ReturnType<ViewPolicy<unknown[], Model>>;
@@ -35,9 +40,15 @@ export type ViewHookReturn<Model extends ViewModel> = {
   isUpdating: boolean;
 };
 
+export type ViewHook<
+  Records extends ViewPolicyRecords<AnyViewPolicyDraftRecords>,
+> = <Model extends ViewModel>(
+  param: ViewHookParam<Records, Model>,
+) => ViewHookReturn<Model>;
+
 // useStaticView
 export type StaticViewHookParam<
-  Records extends AnyViewPolicyRecords,
+  Records extends ViewPolicyRecords<AnyViewPolicyDraftRecords>,
   Model extends ViewModel,
 > = (view: Records) => {
   policy: ReturnType<ViewPolicy<unknown[], Model>>;
@@ -49,10 +60,15 @@ export type StaticViewHookReturn<Model extends ViewModel> = {
   data: TypeOf<Model>;
   context?: unknown;
 };
+export type StaticViewHook<
+  Records extends ViewPolicyRecords<AnyViewPolicyDraftRecords>,
+> = <Model extends ViewModel>(
+  param: StaticViewHookParam<Records, Model>,
+) => StaticViewHookReturn<Model>;
 
 // useViewState
 export type ViewStateHookParam<
-  Records extends AnyViewPolicyRecords,
+  Records extends ViewPolicyRecords<AnyViewPolicyDraftRecords>,
   Model extends ViewModel,
 > = (view: Records) => {
   policy: ReturnType<ViewPolicy<unknown[], Model>>;
@@ -63,51 +79,25 @@ export type ViewStateHookParam<
   queryOptions?: QueryConfigs;
 };
 
-export type ViewStateHookReturn<Model extends ViewModel> = (
-  | {
-      status: "IDLE";
-      data: null;
-      error: null;
-      isLoaded: false;
-      isFetching: false;
-    }
-  | {
-      status: "LOADING";
-      data: null;
-      error: null;
-      isLoaded: false;
-      isFetching: true;
-    }
-  | {
-      status: "SUCCESS";
-      data: TypeOf<Model>;
-      error: null;
-      isLoaded: true;
-      isFetching: false;
-    }
-  | {
-      status: "FAIL";
-      data: null;
-      error: unknown;
-      isLoaded: false;
-      isFetching: false;
-    }
-  | {
-      status: "UPDATING";
-      data: TypeOf<Model>;
-      error: null;
-      isLoaded: true;
-      isFetching: true;
-    }
-) & {
-  context?: unknown;
-};
+export type ViewStateHookReturn<Model extends ViewModel> =
+  ViewStateEnum<Model> & {
+    context?: unknown;
+  };
+
+export type ViewStateHook<
+  Records extends ViewPolicyRecords<AnyViewPolicyDraftRecords>,
+> = <Model extends ViewModel>(
+  param: ViewStateHookParam<Records, Model>,
+) => ViewStateHookReturn<Model>;
 
 /*
  * Intent
  */
 export type IntentHookParam<
-  Records extends AnyIntentPolicyRecords,
+  Records extends IntentPolicyRecords<
+    ViewPolicyRecords<AnyViewPolicyDraftRecords>,
+    AnyIntentPolicyDraftRecords<ViewPolicyRecords<AnyViewPolicyDraftRecords>>
+  >,
   Model extends IntentModel<ZodAnyObject, ZodType>,
 > = (intent: Records) => {
   policy: ReturnType<
@@ -118,7 +108,6 @@ export type IntentHookParam<
   ) => Promise<TypeOf<Model["output"]>>;
   placeholder?: Partial<TypeOf<Model["input"]>>;
 };
-
 export type IntentHookReturn<Model extends IntentModel<ZodAnyObject, ZodType>> =
   {
     input: {
@@ -129,3 +118,11 @@ export type IntentHookReturn<Model extends IntentModel<ZodAnyObject, ZodType>> =
     send: (request: TypeOf<Model["input"]>) => Promise<TypeOf<Model["output"]>>;
     isValid: boolean;
   };
+export type IntentHook<
+  Records extends IntentPolicyRecords<
+    ViewPolicyRecords<AnyViewPolicyDraftRecords>,
+    AnyIntentPolicyDraftRecords<ViewPolicyRecords<AnyViewPolicyDraftRecords>>
+  >,
+> = <Model extends IntentModel<ZodAnyObject, ZodType>>(
+  param: IntentHookParam<Records, Model>,
+) => IntentHookReturn<Model>;

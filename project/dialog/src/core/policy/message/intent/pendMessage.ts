@@ -7,7 +7,7 @@ const model = FakeMessage.extend({ isResolve: z.boolean() });
 export const IPPendMessage = IP(() => ({
   key: ["message", "pendMessage"],
   model: { input: model, output: model },
-  connect: ({ view, output }) =>
+  connect: (view, { output }) =>
     output.isResolve
       ? [
           view.message

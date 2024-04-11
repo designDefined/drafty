@@ -7,5 +7,5 @@ const output = User;
 export const IPChangeProfile = IP(() => ({
   key: ["user", "changeProfile"],
   model: { input, output },
-  connect: ({ view }) => [view.user.me().invalidate()],
+  connect: (view) => [view.user.me().invalidate()],
 }));

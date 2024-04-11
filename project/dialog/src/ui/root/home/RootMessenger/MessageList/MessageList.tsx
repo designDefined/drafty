@@ -1,5 +1,4 @@
 import { useStaticView, useView } from "@core/policy";
-
 import { MessageRepository } from "@/core/repository/message";
 import styles from "./MessageList.module.css";
 import { css } from "@design/style";

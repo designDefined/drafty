@@ -1,9 +1,15 @@
-import PVI from "@pvi/react";
+import queryClient from "../external/queryClient";
+import { integrateWithReact } from "../../../../../library/pvi/react";
 import { intentPolicy } from "./intentPolicy";
 import { viewPolicy } from "./viewPolicy";
 
-export const { useView, useStaticView, useViewState } =
-  PVI.createViewHooks(viewPolicy);
-export const { useIntent } = PVI.createIntentHooks(intentPolicy);
+export const {
+  policy,
+  hooks: { useView, useStaticView, useViewState, useIntent },
+} = integrateWithReact({
+  viewPolicy,
+  intentPolicy,
+  queryClient,
+});
 
-export const policy = { view: viewPolicy, intent: intentPolicy };
+console.log(policy);

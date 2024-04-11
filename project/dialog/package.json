@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@pvi/core": "workspace:^",
     "@pvi/react": "workspace:^",
     "@tanstack/react-query": "^5.28.9",
     "cascade": "workspace:^",

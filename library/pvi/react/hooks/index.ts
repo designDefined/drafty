@@ -1,20 +1,24 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { ZodAnyObject } from "@pvi/core/adapter/zod/types";
+import { IntentModel, IntentPolicyRecords } from "@pvi/core/types/intent";
+import { ViewModel, ViewPolicyRecords } from "@pvi/core/types/view";
+import { SuspenseQueryConfigs } from "../adapter/react-query/configs";
 import {
-  IntentHookReturn,
-  IntentHookParam,
   ViewHookParam,
   ViewHookReturn,
   StaticViewHookParam,
   StaticViewHookReturn,
   ViewStateHookParam,
   ViewStateHookReturn,
-} from "./types";
-import { SuspenseQueryConfigs } from "../adapter/react-query/configs";
-import { useMemo, useState } from "react";
-import { ZodAnyObject } from "../adapter/zod/types";
+  IntentHookParam,
+  IntentHookReturn,
+} from "../types/hooks";
+import {
+  AnyIntentPolicyDraftRecords,
+  AnyViewPolicyDraftRecords,
+} from "../../core/types/typesAny";
 import { TypeOf, ZodType } from "zod";
-import { IntentModel, ViewModel } from "../core/types";
-import { AnyIntentPolicyRecords, AnyViewPolicyRecords } from "../core/typesAny";
 
 const defaultViewQueryConfigs: SuspenseQueryConfigs = {
   retry: 0,
@@ -28,7 +32,9 @@ const defaultLocalViewQueryConfigs: SuspenseQueryConfigs = {
   gcTime: Infinity,
 };
 
-const createViewHooks = <Records extends AnyViewPolicyRecords>(
+const createViewHooks = <
+  Records extends ViewPolicyRecords<AnyViewPolicyDraftRecords>,
+>(
   records: Records,
 ) => {
   const recordsCache = records;
@@ -99,6 +105,7 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
         return {
           status: "FAIL",
           data: null,
+          context: null,
           error,
           isLoaded: false,
           isFetching: false,
@@ -107,14 +114,14 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
         if (isFetching)
           return {
             status: "UPDATING",
-            data,
+            ...data,
             error: null,
             isLoaded: true,
             isFetching: true,
           };
         return {
           status: "SUCCESS",
-          data,
+          ...data,
           error: null,
           isLoaded: true,
           isFetching: false,
@@ -124,6 +131,7 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
         return {
           status: "LOADING",
           data: null,
+          context: null,
           error: null,
           isFetching: true,
           isLoaded: false,
@@ -131,6 +139,7 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
       return {
         status: "IDLE",
         data: null,
+        context: null,
         error: null,
         isFetching: false,
         isLoaded: false,
@@ -143,7 +152,12 @@ const createViewHooks = <Records extends AnyViewPolicyRecords>(
   return { useView, useStaticView, useViewState };
 };
 
-const createIntentHooks = <Records extends AnyIntentPolicyRecords>(
+const createIntentHooks = <
+  Records extends IntentPolicyRecords<
+    ViewPolicyRecords<AnyViewPolicyDraftRecords>,
+    AnyIntentPolicyDraftRecords<ViewPolicyRecords<AnyViewPolicyDraftRecords>>
+  >,
+>(
   records: Records,
 ) => {
   const recordsCache = records;
@@ -178,8 +192,9 @@ const createIntentHooks = <Records extends AnyIntentPolicyRecords>(
         const input = policy.model.input.parse(request);
         const response = await repository(input);
         const output = policy.model.output.parse(response);
-        if (policy.connect)
+        if (policy.connect) {
           await Promise.all(policy.connect({ input, output }));
+        }
         return output;
       } catch (e) {
         return Promise.reject(e);

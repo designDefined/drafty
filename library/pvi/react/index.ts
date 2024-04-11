@@ -1,11 +1,3 @@
-import { createIntentPolicyFactory, createViewPolicyFactory } from "./core";
-import { createIntentHooks, createViewHooks } from "./hooks";
+import { integrateWithReact } from "./integrate";
 
-const PVI = {
-  createViewPolicyFactory,
-  createIntentPolicyFactory,
-  createViewHooks,
-  createIntentHooks,
-};
-
-export default PVI;
+export { integrateWithReact };

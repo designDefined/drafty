@@ -1,4 +1,3 @@
-import PVI from "@pvi/react";
-import queryClient from "../external/queryClient";
+import { createViewPolicy } from "@pvi/core";
 
-export const VP = PVI.createViewPolicyFactory(queryClient);
+export const VP = createViewPolicy();

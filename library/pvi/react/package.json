@@ -4,6 +4,7 @@
   "type": "module",
   "main": "index.ts",
   "peerDependencies": {
+    "@pvi/core": "workspace:^",
     "@tanstack/react-query": "^5.14.1",
     "react": "^18.2.0"
   }

@@ -1,4 +1,4 @@
-import PVI from "@pvi/react";
+import { createIntentPolicy } from "@pvi/core";
 import { viewPolicy } from "./viewPolicy";
 
-export const IP = PVI.createIntentPolicyFactory(viewPolicy);
+export const IP = createIntentPolicy(viewPolicy);

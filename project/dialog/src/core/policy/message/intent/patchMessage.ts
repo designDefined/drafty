@@ -6,7 +6,7 @@ const output = Message;
 export const IPPatchMessage = IP(() => ({
   key: ["message", "patchMessage"],
   model: { input, output },
-  connect: ({ view, output }) => [
+  connect: (view, { output }) => [
     view.message
       .messages()
       .map((prev) =>
