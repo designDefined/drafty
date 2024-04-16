@@ -11,7 +11,7 @@ const form = z.object({
 const SampleIntentPolicy = IP(() => ({
   key: ["sample"],
   model: { input: form, output: z.string() },
-  connect: [],
+  connect: () => [],
 }));
 
 export default function Register() {

@@ -1,8 +1,9 @@
 import { IP } from "@policy-maker/core";
 import { User } from "../../../entity/user";
+import { viewPolicy } from "@core/policy/view";
 
 export const IPChangeProfile = IP(() => ({
   key: ["user", "changeProfile"],
   model: { input: User.pick({ name: true }), output: User },
-  connect: [],
+  connect: ({ output }) => [viewPolicy.user.me().map(() => output)],
 }));
