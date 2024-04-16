@@ -9,7 +9,7 @@ type WrappedWithContext<T> = {
   data: Data<T>;
   context: unknown;
 };
-type Wrapped<T> = WrappedJust<T> | WrappedWithContext<T>;
+export type Wrapped<T> = WrappedJust<T> | WrappedWithContext<T>;
 
 export const wrap = <Model extends ViewModel>(
   data: Data<TypeOf<Model>> | DataWithContext<TypeOf<Model>>,

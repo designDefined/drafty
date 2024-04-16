@@ -43,8 +43,7 @@ export const useView = <Model extends ViewModel>({
     queryFn: () =>
       repository()
         .then((res) => (mergeFn ? mergeFn(prev, res) : res))
-        .then((data) => wrap(data, policy.model))
-        .then((wrapped) => wrapped),
+        .then((data) => wrap(data, policy.model)),
     initialData: initialData && wrap(initialData, policy.model),
     ...defaultQueryConfig,
     ...queryConfig,

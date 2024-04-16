@@ -2,10 +2,16 @@ import { IntentModel, IntentPolicy } from "@policy-maker/core";
 import { TypeOf } from "zod";
 import { InputState, useInput } from "./useInput";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Wrapped } from "../function/wrap";
 
 export type ImplementedIntentPolicy<Model extends IntentModel> = ReturnType<
   IntentPolicy<unknown[], Model>
 >;
+
+type Config = Partial<{
+  immediateReset: boolean;
+}>;
 
 type Param<Model extends IntentModel> = {
   policy: ImplementedIntentPolicy<Model>;
@@ -13,6 +19,7 @@ type Param<Model extends IntentModel> = {
     input: TypeOf<Model["input"]>,
   ) => Promise<TypeOf<Model["output"]>>;
   initialData: Required<TypeOf<Model["input"]>>;
+  config?: Config;
 };
 
 type Send<Model extends IntentModel> = (
@@ -29,20 +36,40 @@ type Return<Model extends IntentModel> = Input<Model> & {
   isWorking: boolean;
 };
 
+const defaultConfig: Config = {
+  immediateReset: false,
+};
+
 export const useIntent = <Model extends IntentModel>({
   policy,
   repository,
   initialData,
+  config,
 }: Param<Model>): Return<Model> => {
+  const mergedConfig = { ...defaultConfig, ...config };
+  const queryClient = useQueryClient();
   const [isWorking, setIsWorking] = useState(false);
-  const input = useInput<Model["input"]>(policy.model.input, initialData);
-  const send: Send<Model> = (data) => {
+  const inputs = useInput<Model["input"]>(policy.model.input, initialData);
+  const send: Send<Model> = (input) => {
     if (isWorking) return Promise.reject();
     setIsWorking(true);
-    return repository(data)
-      .then((data) => {
+    return repository(input)
+      .then((output) => {
+        policy.connect({ input, output }).forEach((connection) => {
+          if (connection.type === "invalidate")
+            queryClient.invalidateQueries({ queryKey: connection.key });
+          if (connection.type === "map")
+            queryClient.setQueryData(
+              connection.key,
+              (prev: Wrapped<unknown> | undefined) => {
+                if (!prev) return prev;
+                const data = connection.mapFn(prev.data);
+                return { ...prev, data };
+              },
+            );
+        });
         setIsWorking(false);
-        return data;
+        return output;
       })
       .catch((e) => {
         setIsWorking(false);
@@ -50,18 +77,35 @@ export const useIntent = <Model extends IntentModel>({
       });
   };
   const submit: Submit<Model> = () => {
-    if (!input.isValid || isWorking) return Promise.reject();
+    if (!inputs.isValid || isWorking) return Promise.reject();
     setIsWorking(true);
-    return repository(input.inputValues)
-      .then((data) => {
+    const cachedInput = { ...inputs.inputValues };
+    if (mergedConfig.immediateReset) inputs.reset();
+    return repository(cachedInput)
+      .then((output) => {
+        policy
+          .connect({ input: inputs.inputValues, output })
+          .forEach((connection) => {
+            if (connection.type === "invalidate")
+              queryClient.invalidateQueries({ queryKey: connection.key });
+            if (connection.type === "map")
+              queryClient.setQueryData(
+                connection.key,
+                (prev: Wrapped<unknown> | undefined) => {
+                  if (!prev) return prev;
+                  const data = connection.mapFn(prev.data);
+                  return { ...prev, data };
+                },
+              );
+          });
         setIsWorking(false);
-        input.reset();
-        return data;
+        if (!mergedConfig.immediateReset) inputs.reset();
+        return output;
       })
       .catch((e) => {
         setIsWorking(false);
         return Promise.reject(e);
       });
   };
-  return { ...input, send, submit, isWorking };
+  return { ...inputs, send, submit, isWorking };
 };

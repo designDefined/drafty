@@ -1,18 +1,23 @@
-import { ZodType } from "zod";
+import { TypeOf, ZodType } from "zod";
 import { PolicyKey } from "./common";
 
 export type ViewModel = ZodType;
 
-type ViewMapFn<Model extends ViewModel> = (prev: Model) => Model;
-type ViewRevalidateInterface = {
+type ViewMapFn<Model extends ViewModel> = (
+  prev: TypeOf<Model>,
+) => TypeOf<Model>;
+type ViewInvalidateInterface = {
+  type: "invalidate";
   key: PolicyKey;
 };
-type ViewMapInterface<Model extends ViewModel = ViewModel> = {
+type ViewMapInterface = {
+  type: "map";
   key: PolicyKey;
-  mapFn: ViewMapFn<Model>;
+  mapFn: (prev: unknown) => unknown;
 };
+
 export type ViewConnectionInterface =
-  | ViewRevalidateInterface
+  | ViewInvalidateInterface
   | ViewMapInterface;
 
 type ViewPolicyParam<Deps extends unknown[], Model extends ViewModel> = (
@@ -27,8 +32,8 @@ export type ViewPolicy<Deps extends unknown[], Model extends ViewModel> = (
 ) => {
   key: PolicyKey;
   model: Model;
-  revalidate: () => ViewRevalidateInterface;
-  map: (mapFn: ViewMapFn<Model>) => ViewMapInterface<Model>;
+  invalidate: () => ViewInvalidateInterface;
+  map: (mapFn: ViewMapFn<Model>) => ViewMapInterface;
 };
 
 export const VP =
@@ -37,10 +42,13 @@ export const VP =
   ): ViewPolicy<Deps, Model> =>
   (...deps: Deps) => {
     const injected = policy(...deps);
-    const revalidate = () => ({ key: injected.key });
-    const map = (mapFn: ViewMapFn<Model>) => ({
-      key: injected.key,
-      mapFn,
-    });
-    return { ...injected, revalidate, map };
+    const invalidate = () =>
+      ({ type: "invalidate", key: injected.key }) as const;
+    const map = (mapFn: ViewMapFn<Model>) =>
+      ({
+        type: "map",
+        key: injected.key,
+        mapFn,
+      }) as const;
+    return { ...injected, invalidate, map };
   };
