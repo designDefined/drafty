@@ -1,4 +1,4 @@
-import { IP } from "@core/policy/intentPolicyFactory";
+import { IP } from "@/core/policy/intentPolicyFactory";
 import { Message } from "@/core/base/entity/message";
 
 const input = Message.pick({ text: true });

@@ -90,9 +90,11 @@ const createViewHooks = <
       queryFn: async () => {
         try {
           const { data, context } = await repository();
+          console.log(data[0]);
           const parsedData = policy.model.parse(data);
           return { data: parsedData, context };
         } catch (e) {
+          console.error(e);
           return Promise.reject(e);
         }
       },

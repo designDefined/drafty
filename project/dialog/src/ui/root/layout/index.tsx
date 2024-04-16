@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import RootHome from "../home";
 import styles from "./index.module.css";
-import { css } from "@design/style";
+import { css } from "@/design/style";
 
 export default function RootLayout() {
   return (

@@ -1,7 +1,7 @@
-import { useStaticView, useView } from "@core/policy";
+import { useStaticView, useView } from "@/core/policy";
 import { MessageRepository } from "@/core/repository/message";
 import styles from "./MessageList.module.css";
-import { css } from "@design/style";
+import { css } from "@/design/style";
 import { useNavigate } from "react-router-dom";
 
 export default function MessageList() {

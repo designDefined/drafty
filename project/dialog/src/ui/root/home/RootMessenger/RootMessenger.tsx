@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import MessageInput from "./MessageInput/MessageInput";
 import MessageList from "./MessageList/MessageList";
 import styles from "./RootMessenger.module.css";
-import { css } from "@design/style";
+import { css } from "@/design/style";
 
 export default function RootMessenger() {
   return (

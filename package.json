@@ -3,13 +3,14 @@
   "private": true,
   "packageManager": "yarn@4.1.1",
   "scripts": {
-    "dialog": "yarn workspace dialog",
+    "dialog": "yarn workspace @client/dialog",
     "mock": "yarn workspace mock",
     "initialize-db": "yarn mock initialize",
     "dev:dialog": "concurrently \"yarn mock dialog\" \"yarn dialog dev\""
   },
   "workspaces": [
     "library/**/*",
+    "core/**/*",
     "project/**/*",
     "mock"
   ],

@@ -1,5 +1,5 @@
 import { FakeMessage } from "@/core/base/entity/message";
-import { IP } from "@core/policy/intentPolicyFactory";
+import { IP } from "@/core/policy/intentPolicyFactory";
 import { z } from "zod";
 
 const model = FakeMessage.extend({ isResolve: z.boolean() });

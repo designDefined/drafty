@@ -1,7 +1,7 @@
 import { ErrorBoundary } from "react-error-boundary";
 import RootMessenger from "./RootMessenger/RootMessenger";
 import styles from "./index.module.css";
-import { bindStyle } from "@design/style";
+import { bindStyle } from "@/design/style";
 import RootHeader from "./RootHeader/RootHeader";
 
 const cx = bindStyle<"RootHome">(styles);

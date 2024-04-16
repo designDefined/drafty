@@ -1,7 +1,7 @@
 import styles from "./index.module.css";
-import { cssNamed } from "@design/style";
+import { cssNamed } from "@/design/style";
 import { ButtonDefaultProps } from "./types";
-import { StyleProps } from "@design/component/types";
+import { StyleProps } from "@/design/component/types";
 
 const { merge } = cssNamed("root");
 

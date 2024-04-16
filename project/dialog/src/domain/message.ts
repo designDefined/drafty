@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { Message } from "@core/base/entity/message";
+import { Message } from "@/core/base/entity/message";
 
 export const useMessageId = () => {
   const param = useParams();

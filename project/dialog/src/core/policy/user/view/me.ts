@@ -1,5 +1,5 @@
-import { VP } from "@core/policy/viewPolicyFactory";
-import { User } from "@/core/base/entity/user";
+import { VP } from "../../../policy/viewPolicyFactory";
+import { User } from "../../../base/entity/user";
 
 export const VPMe = VP(() => ({
   key: ["user", "me"],

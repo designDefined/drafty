@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import styles from "./index.module.css";
-import { css } from "@design/style";
+import { css } from "@/design/style";
 
 export default function MessageLayout() {
   return (

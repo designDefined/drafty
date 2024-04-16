@@ -1,5 +1,5 @@
-import { Message } from "@/core/base/entity/message";
-import { IP } from "@core/policy/intentPolicyFactory";
+import { Message } from "../../../base/entity/message";
+import { IP } from "../../../policy/intentPolicyFactory";
 const input = Message.pick({ text: true }).partial();
 const output = Message;
 

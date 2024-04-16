@@ -1,7 +1,7 @@
 import { useMessageId } from "@/domain/message";
-import { useView } from "@core/policy";
-import { MessageRepository } from "@core/repository/message";
-import { css } from "@design/style";
+import { useView } from "@/core/policy";
+import { MessageRepository } from "@/core/repository/message";
+import { css } from "@/design/style";
 import styles from "./index.module.css";
 
 export default function MessageHome() {

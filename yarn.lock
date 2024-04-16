@@ -286,6 +286,46 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@client/dialog@workspace:project/dialog":
+  version: 0.0.0-use.local
+  resolution: "@client/dialog@workspace:project/dialog"
+  dependencies:
+    "@policy-maker/core": "workspace:^"
+    "@policy-maker/react": "workspace:^"
+    "@pvi/core": "workspace:^"
+    "@pvi/react": "workspace:^"
+    "@tanstack/react-query": "npm:^5.28.9"
+    "@types/react": "npm:^18.2.66"
+    "@types/react-dom": "npm:^18.2.22"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    "@typescript-eslint/parser": "npm:^7.2.0"
+    "@vitejs/plugin-react": "npm:^4.2.1"
+    cascade: "workspace:^"
+    eslint: "npm:^8.57.0"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
+    eslint-plugin-react-refresh: "npm:^0.4.6"
+    fetch: "workspace:^"
+    jotai: "npm:^2.8.0"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    react-error-boundary: "npm:^4.0.13"
+    react-router-dom: "npm:^6.22.3"
+    typescript: "npm:^5.2.2"
+    vite: "npm:^5.2.0"
+    vite-tsconfig-paths: "npm:^4.3.2"
+    zod: "npm:^3.22.4"
+  languageName: unknown
+  linkType: soft
+
+"@core/dialog@workspace:core/dialog":
+  version: 0.0.0-use.local
+  resolution: "@core/dialog@workspace:core/dialog"
+  dependencies:
+    "@policy-maker/core": "workspace:^"
+    zod: "npm:^3.22.4"
+  languageName: unknown
+  linkType: soft
+
 "@esbuild/aix-ppc64@npm:0.20.2":
   version: 0.20.2
   resolution: "@esbuild/aix-ppc64@npm:0.20.2"
@@ -625,6 +665,25 @@ __metadata:
   checksum: 10c0/5bd7576bb1b38a47a7fc7b51ac9f38748e772beebc56200450c4a817d712232b8f1d3ef70532c80840243c657d491cf6a6be1e3a214cff907645819fdc34aadd
   languageName: node
   linkType: hard
+
+"@policy-maker/core@workspace:^, @policy-maker/core@workspace:library/policy-maker/core":
+  version: 0.0.0-use.local
+  resolution: "@policy-maker/core@workspace:library/policy-maker/core"
+  peerDependencies:
+    zod: ^3.22.4
+  languageName: unknown
+  linkType: soft
+
+"@policy-maker/react@workspace:^, @policy-maker/react@workspace:library/policy-maker/react":
+  version: 0.0.0-use.local
+  resolution: "@policy-maker/react@workspace:library/policy-maker/react"
+  peerDependencies:
+    "@policy-maker/core": "workspace:^"
+    "@tanstack/react-query": ^5.28.9
+    react: ^18.2.0
+    zod: ^3.22.4
+  languageName: unknown
+  linkType: soft
 
 "@pvi/core@workspace:^, @pvi/core@workspace:library/pvi/core":
   version: 0.0.0-use.local
@@ -1614,34 +1673,6 @@ __metadata:
   checksum: 10c0/bd7633942f57418f5a3b80d5cb53898127bcf53e24cdf5d5f4396be471417671f0fee48a4ebe9a1e9defbde2a31280011af58a57e090ff822f589b443ed4e643
   languageName: node
   linkType: hard
-
-"dialog@workspace:project/dialog":
-  version: 0.0.0-use.local
-  resolution: "dialog@workspace:project/dialog"
-  dependencies:
-    "@pvi/core": "workspace:^"
-    "@pvi/react": "workspace:^"
-    "@tanstack/react-query": "npm:^5.28.9"
-    "@types/react": "npm:^18.2.66"
-    "@types/react-dom": "npm:^18.2.22"
-    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
-    "@typescript-eslint/parser": "npm:^7.2.0"
-    "@vitejs/plugin-react": "npm:^4.2.1"
-    cascade: "workspace:^"
-    eslint: "npm:^8.57.0"
-    eslint-plugin-react-hooks: "npm:^4.6.0"
-    eslint-plugin-react-refresh: "npm:^0.4.6"
-    fetch: "workspace:^"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    react-error-boundary: "npm:^4.0.13"
-    react-router-dom: "npm:^6.22.3"
-    typescript: "npm:^5.2.2"
-    vite: "npm:^5.2.0"
-    vite-tsconfig-paths: "npm:^4.3.2"
-    zod: "npm:^3.22.4"
-  languageName: unknown
-  linkType: soft
 
 "dir-glob@npm:^3.0.1":
   version: 3.0.1
@@ -2653,6 +2684,21 @@ __metadata:
   version: 1.4.0
   resolution: "jju@npm:1.4.0"
   checksum: 10c0/f3f444557e4364cfc06b1abf8331bf3778b26c0c8552ca54429bc0092652172fdea26cbffe33e1017b303d5aa506f7ede8571857400efe459cb7439180e2acad
+  languageName: node
+  linkType: hard
+
+"jotai@npm:^2.8.0":
+  version: 2.8.0
+  resolution: "jotai@npm:2.8.0"
+  peerDependencies:
+    "@types/react": ">=17.0.0"
+    react: ">=17.0.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    react:
+      optional: true
+  checksum: 10c0/6b2f59749530478163e41b8b1260b99cdab533541a5b9b2dcd885f2ab440391c5ee7855d627cbe28e043b9bcd736d44837b4a8ab20a2761176bba92e623a284e
   languageName: node
   linkType: hard
 

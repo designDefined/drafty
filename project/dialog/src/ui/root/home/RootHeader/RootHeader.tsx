@@ -1,5 +1,5 @@
 import MyInformation from "@/ui/user/MyInformation/MyInformation";
-import { css } from "@design/style";
+import { css } from "@/design/style";
 import { Suspense } from "react";
 import styles from "./RootHeader.module.css";
 

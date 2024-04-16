@@ -1,8 +1,8 @@
 import { useIntent } from "@/core/policy";
 import { MessageRepository } from "@/core/repository/message";
 import styles from "./MessageInput.module.css";
-import { css } from "@design/style";
-import Button from "@design/component/buttons/Button";
+import { css } from "@/design/style";
+import Button from "@/design/component/buttons/Button";
 
 export default function MessageInput() {
   const {

@@ -1,5 +1,5 @@
-import { User } from "@/core/base/entity/user";
-import { IP } from "@core/policy/intentPolicyFactory";
+import { User } from "../../../base/entity/user";
+import { IP } from "../../../policy/intentPolicyFactory";
 
 const input = User.pick({ name: true });
 const output = User;
