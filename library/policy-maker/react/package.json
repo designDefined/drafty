@@ -1,0 +1,12 @@
+{
+  "name": "@policy-maker/react",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "peerDependencies": {
+    "@policy-maker/core": "workspace:^",
+    "@tanstack/react-query": "^5.28.9",
+    "react": "^18.2.0",
+    "zod": "^3.22.4"
+  }
+}
