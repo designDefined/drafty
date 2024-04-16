@@ -1,0 +1,11 @@
+{
+  "name": "@core/dialog",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "indec.ts",
+  "dependencies": {
+    "@policy-maker/core": "workspace:^",
+    "zod": "^3.22.4"
+  }
+}
