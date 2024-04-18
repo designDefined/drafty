@@ -677,6 +677,9 @@ __metadata:
 "@policy-maker/react@workspace:^, @policy-maker/react@workspace:library/policy-maker/react":
   version: 0.0.0-use.local
   resolution: "@policy-maker/react@workspace:library/policy-maker/react"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    use-debounce: "npm:^10.0.0"
   peerDependencies:
     "@policy-maker/core": "workspace:^"
     "@tanstack/react-query": ^5.28.9
@@ -4268,6 +4271,15 @@ __metadata:
   dependencies:
     punycode: "npm:^2.1.0"
   checksum: 10c0/4ef57b45aa820d7ac6496e9208559986c665e49447cb072744c13b66925a362d96dd5a46c4530a6b8e203e5db5fe849369444440cb22ecfc26c679359e5dfa3c
+  languageName: node
+  linkType: hard
+
+"use-debounce@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "use-debounce@npm:10.0.0"
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 10c0/c1166cba52dedeab17e3e29275af89c57a3e8981b75f6e38ae2896ac36ecd4ed7d8fff5f882ba4b2f91eac7510d5ae0dd89fa4f7d081622ed436c3c89eda5cd1
   languageName: node
   linkType: hard
 

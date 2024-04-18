@@ -52,3 +52,7 @@ export const VP =
       }) as const;
     return { ...injected, invalidate, map };
   };
+
+export type ImplementedViewPolicy<Model extends ViewModel> = ReturnType<
+  ViewPolicy<unknown[], Model>
+>;

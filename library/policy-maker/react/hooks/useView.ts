@@ -1,54 +1,73 @@
-import { ViewPolicy, ViewModel } from "@policy-maker/core";
+import { ViewModel, ImplementedViewPolicy } from "@policy-maker/core";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { TypeOf } from "zod";
-import { wrap } from "../function/wrap";
 import { useStore } from "../store/useStore";
+import { useCallback, useState } from "react";
 
-export type ImplementedViewPolicy<Model extends ViewModel> = ReturnType<
-  ViewPolicy<unknown[], Model>
->;
-export type Wrappable<T> = T | [T, unknown];
-export type QueryConfig = {
+export type ViewConfig = {
   staleTime?: number;
   gcTime?: number;
+  retry?: number;
 };
+type ContinueFetch<T> = (fn: (prev: T) => Promise<T>) => Promise<void>;
 
-const defaultQueryConfig: QueryConfig = {
+const defaultViewConfig: ViewConfig = {
   staleTime: Infinity,
   gcTime: 60 * 1000,
+  retry: 0,
 };
 
 type Param<Model extends ViewModel> = {
   policy: ImplementedViewPolicy<Model>;
-  repository: () => Promise<Wrappable<TypeOf<Model>>>;
-  initialData?: Wrappable<TypeOf<Model>>;
-  mergeFn?: (prev: TypeOf<Model>, next: TypeOf<Model>) => TypeOf<Model>;
-  queryConfig?: QueryConfig;
+  repository: () => Promise<TypeOf<Model>>;
+  initialData?: TypeOf<Model>;
+  config?: ViewConfig;
 };
 type Return<Data> = {
   data: Data;
-  isUpdating: boolean;
+  isFetching: boolean;
+  isRefetching: boolean;
+  isContinueFetching: boolean;
+  continueFetch: ContinueFetch<Data>;
 };
 
 export const useView = <Model extends ViewModel>({
   policy,
   repository,
   initialData,
-  mergeFn,
-  queryConfig,
+  config,
 }: Param<Model>): Return<TypeOf<Model>> => {
-  const [prev] = useStore<Model>(policy.key, policy.model);
-  const { data, isFetching } = useSuspenseQuery({
+  const [isContinueFetching, setIsContinueFetching] = useState(false);
+  const { get, set } = useStore<Model>(policy.key, policy.model);
+  const { data, isFetching: isRefetching } = useSuspenseQuery({
     queryKey: policy.key,
-    queryFn: () =>
-      repository()
-        .then((res) => (mergeFn ? mergeFn(prev, res) : res))
-        .then((data) => wrap(data, policy.model)),
-    initialData: initialData && wrap(initialData, policy.model),
-    ...defaultQueryConfig,
-    ...queryConfig,
+    queryFn: repository,
+    initialData,
+    ...defaultViewConfig,
+    ...config,
   });
-  return { data: data.data, isUpdating: isFetching };
+  const continueFetch: ContinueFetch<TypeOf<Model>> = useCallback(
+    async (fn) => {
+      try {
+        setIsContinueFetching(true);
+        const prev = get();
+        const fetched = await (prev ? fn(prev) : repository());
+        setIsContinueFetching(false);
+        set(() => fetched);
+      } catch (e) {
+        setIsContinueFetching(false);
+        throw e;
+      }
+    },
+    [],
+  );
+  return {
+    data,
+    isFetching: isContinueFetching || isRefetching,
+    isRefetching,
+    isContinueFetching,
+    continueFetch,
+  };
 };
 
 export const useViewState = useView;

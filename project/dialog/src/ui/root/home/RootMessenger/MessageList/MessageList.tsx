@@ -4,12 +4,16 @@ import { css } from "@/design/style";
 import { useNavigate } from "react-router-dom";
 import { useView } from "@policy-maker/react";
 import { viewPolicy } from "@core/policy/view";
+import { useCallback } from "react";
 
 export default function MessageList() {
   const navigate = useNavigate();
-  const { data: messages } = useView({
+  const {
+    data: { data: messages, next },
+    continueFetch,
+  } = useView({
     policy: viewPolicy.message.messages(),
-    repository: MessageRepository.messages,
+    repository: () => MessageRepository.messages(),
   });
 
   const { data: pendingMessages } = useView({
@@ -17,6 +21,15 @@ export default function MessageList() {
     repository: () => Promise.resolve([]),
     initialData: [],
   });
+
+  const getNextMessages = useCallback(() => {
+    continueFetch(async (prevData) => {
+      console.log(prevData);
+      if (!prevData.next) return prevData;
+      const { data, next } = await MessageRepository.messages(prevData.next);
+      return { data: [...prevData.data, ...data], next };
+    });
+  }, [continueFetch]);
 
   return (
     <ul className={css(() => [styles.MessageList])}>
@@ -42,6 +55,7 @@ export default function MessageList() {
           <div className={css(() => styles.date)}>{createTime}</div>
         </div>
       ))}
+      {next && <button onClick={() => getNextMessages()}>Next</button>}
     </ul>
   );
 }

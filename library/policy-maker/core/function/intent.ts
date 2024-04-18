@@ -22,3 +22,7 @@ export type IntentPolicy<Deps extends unknown[], Model extends IntentModel> = (
 export const IP = <Deps extends unknown[], Model extends IntentModel>(
   input: IntentPolicy<Deps, Model>,
 ) => input;
+
+export type ImplementedIntentPolicy<Model extends IntentModel> = ReturnType<
+  IntentPolicy<unknown[], Model>
+>;

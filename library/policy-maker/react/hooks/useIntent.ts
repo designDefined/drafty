@@ -1,15 +1,10 @@
-import { IntentModel, IntentPolicy } from "@policy-maker/core";
+import { IntentModel, ImplementedIntentPolicy } from "@policy-maker/core";
 import { TypeOf } from "zod";
 import { InputState, useInput } from "./useInput";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Wrapped } from "../function/wrap";
 
-export type ImplementedIntentPolicy<Model extends IntentModel> = ReturnType<
-  IntentPolicy<unknown[], Model>
->;
-
-type Config = Partial<{
+type IntentConfig = Partial<{
   immediateReset: boolean;
 }>;
 
@@ -19,7 +14,7 @@ type Param<Model extends IntentModel> = {
     input: TypeOf<Model["input"]>,
   ) => Promise<TypeOf<Model["output"]>>;
   initialData: Required<TypeOf<Model["input"]>>;
-  config?: Config;
+  config?: IntentConfig;
 };
 
 type Send<Model extends IntentModel> = (
@@ -36,7 +31,7 @@ type Return<Model extends IntentModel> = Input<Model> & {
   isWorking: boolean;
 };
 
-const defaultConfig: Config = {
+const defaultConfig: IntentConfig = {
   immediateReset: false,
 };
 
@@ -59,14 +54,10 @@ export const useIntent = <Model extends IntentModel>({
           if (connection.type === "invalidate")
             queryClient.invalidateQueries({ queryKey: connection.key });
           if (connection.type === "map")
-            queryClient.setQueryData(
-              connection.key,
-              (prev: Wrapped<unknown> | undefined) => {
-                if (!prev) return prev;
-                const data = connection.mapFn(prev.data);
-                return { ...prev, data };
-              },
-            );
+            queryClient.setQueryData(connection.key, (prev: unknown) => {
+              if (!prev) return prev;
+              return connection.mapFn(prev);
+            });
         });
         setIsWorking(false);
         return output;
@@ -89,14 +80,10 @@ export const useIntent = <Model extends IntentModel>({
             if (connection.type === "invalidate")
               queryClient.invalidateQueries({ queryKey: connection.key });
             if (connection.type === "map")
-              queryClient.setQueryData(
-                connection.key,
-                (prev: Wrapped<unknown> | undefined) => {
-                  if (!prev) return prev;
-                  const data = connection.mapFn(prev.data);
-                  return { ...prev, data };
-                },
-              );
+              queryClient.setQueryData(connection.key, (prev: unknown) => {
+                if (!prev) return prev;
+                return connection.mapFn(prev);
+              });
           });
         setIsWorking(false);
         if (!mergedConfig.immediateReset) inputs.reset();
