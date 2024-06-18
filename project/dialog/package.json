@@ -10,10 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@policy-maker/core": "workspace:^",
-    "@policy-maker/react": "workspace:^",
-    "@pvi/core": "workspace:^",
-    "@pvi/react": "workspace:^",
+    "@policy-maker-old/core": "workspace:^",
+    "@policy-maker-old/react": "workspace:^",
     "@tanstack/react-query": "^5.28.9",
     "cascade": "workspace:^",
     "fetch": "workspace:^",

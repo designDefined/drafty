@@ -1,6 +1,6 @@
 import { PendingMessage } from "@core/entity/message";
 import { viewPolicy } from "@core/policy/view";
-import { IP } from "@policy-maker/core";
+import { IP } from "@policy-maker-old/core";
 import { z } from "zod";
 
 const model = PendingMessage.extend({ isResolve: z.boolean() });

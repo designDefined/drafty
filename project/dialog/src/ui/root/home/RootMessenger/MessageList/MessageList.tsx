@@ -2,7 +2,7 @@ import { MessageRepository } from "@/core/repository/message";
 import styles from "./MessageList.module.css";
 import { css } from "@/design/style";
 import { useNavigate } from "react-router-dom";
-import { useView } from "@policy-maker/react";
+import { useView } from "@policy-maker-old/react";
 import { viewPolicy } from "@core/policy/view";
 import { useCallback } from "react";
 

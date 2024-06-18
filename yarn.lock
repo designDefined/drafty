@@ -290,10 +290,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@client/dialog@workspace:project/dialog"
   dependencies:
-    "@policy-maker/core": "workspace:^"
-    "@policy-maker/react": "workspace:^"
-    "@pvi/core": "workspace:^"
-    "@pvi/react": "workspace:^"
+    "@policy-maker-old/core": "workspace:^"
+    "@policy-maker-old/react": "workspace:^"
     "@tanstack/react-query": "npm:^5.28.9"
     "@types/react": "npm:^18.2.66"
     "@types/react-dom": "npm:^18.2.22"
@@ -321,7 +319,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@core/dialog@workspace:core/dialog"
   dependencies:
-    "@policy-maker/core": "workspace:^"
+    "@policy-maker-old/core": "workspace:^"
     zod: "npm:^3.22.4"
   languageName: unknown
   linkType: soft
@@ -666,29 +664,50 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@policy-maker/core@workspace:^, @policy-maker/core@workspace:library/policy-maker/core":
+"@policy-maker-old/core@workspace:^, @policy-maker-old/core@workspace:library/policy-maker-old/core":
   version: 0.0.0-use.local
-  resolution: "@policy-maker/core@workspace:library/policy-maker/core"
+  resolution: "@policy-maker-old/core@workspace:library/policy-maker-old/core"
   peerDependencies:
     zod: ^3.22.4
   languageName: unknown
   linkType: soft
 
-"@policy-maker/react@workspace:^, @policy-maker/react@workspace:library/policy-maker/react":
+"@policy-maker-old/react@workspace:^, @policy-maker-old/react@workspace:library/policy-maker-old/react":
   version: 0.0.0-use.local
-  resolution: "@policy-maker/react@workspace:library/policy-maker/react"
+  resolution: "@policy-maker-old/react@workspace:library/policy-maker-old/react"
   dependencies:
     fast-deep-equal: "npm:^3.1.3"
     use-debounce: "npm:^10.0.0"
   peerDependencies:
-    "@policy-maker/core": "workspace:^"
+    "@policy-maker-old/core": "workspace:^"
     "@tanstack/react-query": ^5.28.9
     react: ^18.2.0
     zod: ^3.22.4
   languageName: unknown
   linkType: soft
 
-"@pvi/core@workspace:^, @pvi/core@workspace:library/pvi/core":
+"@policy-maker/core@workspace:library/policy-maker/core":
+  version: 0.0.0-use.local
+  resolution: "@policy-maker/core@workspace:library/policy-maker/core"
+  dependencies:
+    nanoid: "npm:^5.0.7"
+  peerDependencies:
+    zod: ^3.23.0
+  languageName: unknown
+  linkType: soft
+
+"@policy-maker/react@workspace:library/policy-maker/react":
+  version: 0.0.0-use.local
+  resolution: "@policy-maker/react@workspace:library/policy-maker/react"
+  peerDependencies:
+    "@policy-maker/core": "workspace:*"
+    react: ^18.0.0
+    react-dom: ^18.0.0
+    zod: ^3.23.0
+  languageName: unknown
+  linkType: soft
+
+"@pvi/core@workspace:library/pvi/core":
   version: 0.0.0-use.local
   resolution: "@pvi/core@workspace:library/pvi/core"
   dependencies:
@@ -696,7 +715,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@pvi/react@workspace:^, @pvi/react@workspace:library/pvi/react":
+"@pvi/react@workspace:library/pvi/react":
   version: 0.0.0-use.local
   resolution: "@pvi/react@workspace:library/pvi/react"
   peerDependencies:
@@ -1605,6 +1624,25 @@ __metadata:
   checksum: 10c0/80c089d6f7e0c5b2bd83cf0539ab41474198579584fa10d86d0cafe0642202343cbc119e076a0b1aece191989477081415d66c9fefbf3c957fc2fc4b7009f248
   languageName: node
   linkType: hard
+
+"cycloid@workspace:project/cycloid":
+  version: 0.0.0-use.local
+  resolution: "cycloid@workspace:project/cycloid"
+  dependencies:
+    "@types/react": "npm:^18.2.66"
+    "@types/react-dom": "npm:^18.2.22"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    "@typescript-eslint/parser": "npm:^7.2.0"
+    "@vitejs/plugin-react": "npm:^4.2.1"
+    eslint: "npm:^8.57.0"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
+    eslint-plugin-react-refresh: "npm:^0.4.6"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    typescript: "npm:^5.2.2"
+    vite: "npm:^5.2.0"
+  languageName: unknown
+  linkType: soft
 
 "date-fns@npm:^2.30.0":
   version: 2.30.0
@@ -3182,6 +3220,15 @@ __metadata:
   bin:
     nanoid: bin/nanoid.cjs
   checksum: 10c0/e3fb661aa083454f40500473bb69eedb85dc160e763150b9a2c567c7e9ff560ce028a9f833123b618a6ea742e311138b591910e795614a629029e86e180660f3
+  languageName: node
+  linkType: hard
+
+"nanoid@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "nanoid@npm:5.0.7"
+  bin:
+    nanoid: bin/nanoid.js
+  checksum: 10c0/a3fb1c157e3e35378f44e5a7130c70f80c9037f66c9a37285e5e3d8298e8405fcb2399baaa420980b0fe5fd9c2e4186a6a31c3526f21de03cf34c1b459871401
   languageName: node
   linkType: hard
 

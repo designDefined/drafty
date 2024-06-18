@@ -5,7 +5,7 @@
   "type": "module",
   "main": "indec.ts",
   "dependencies": {
-    "@policy-maker/core": "workspace:^",
+    "@policy-maker-old/core": "workspace:^",
     "zod": "^3.22.4"
   }
 }

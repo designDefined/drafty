@@ -1,4 +1,4 @@
-import { ViewModel, ImplementedViewPolicy } from "@policy-maker/core";
+import { ViewModel, ImplementedViewPolicy } from "@policy-maker-old/core";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { TypeOf } from "zod";
 import { useStore } from "../store/useStore";

@@ -1,4 +1,4 @@
-import { IntentModel } from "@policy-maker/core";
+import { IntentModel } from "@policy-maker-old/core";
 import { useMemo, useState } from "react";
 import { TypeOf, z } from "zod";
 

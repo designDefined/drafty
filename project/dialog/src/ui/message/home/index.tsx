@@ -1,4 +1,4 @@
-import { useView } from "@policy-maker/react";
+import { useView } from "@policy-maker-old/react";
 import { useMessageId } from "@/domain/message";
 import { MessageRepository } from "@/core/repository/message";
 import { css } from "@/design/style";

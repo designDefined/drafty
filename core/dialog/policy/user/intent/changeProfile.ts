@@ -1,4 +1,4 @@
-import { IP } from "@policy-maker/core";
+import { IP } from "@policy-maker-old/core";
 import { User } from "../../../entity/user";
 import { viewPolicy } from "@core/policy/view";
 

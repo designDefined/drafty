@@ -1,7 +1,7 @@
 import { PAGE_NUMBER } from "@core/constant/page";
 import { Message } from "@core/entity/message";
 import { Infinite } from "@core/entity/util/infinite";
-import { VP } from "@policy-maker/core";
+import { VP } from "@policy-maker-old/core";
 
 export const VPMessages = VP(() => ({
   key: ["message", "messages"],

@@ -1,4 +1,4 @@
-import { useIntent } from "@policy-maker/react";
+import { useIntent } from "@policy-maker-old/react";
 import { MessageRepository } from "@/core/repository/message";
 import styles from "./MessageInput.module.css";
 import { css } from "@/design/style";

@@ -1,4 +1,4 @@
-import { IntentModel, ImplementedIntentPolicy } from "@policy-maker/core";
+import { IntentModel, ImplementedIntentPolicy } from "@policy-maker-old/core";
 import { TypeOf } from "zod";
 import { InputState, useInput } from "./useInput";
 import { useState } from "react";

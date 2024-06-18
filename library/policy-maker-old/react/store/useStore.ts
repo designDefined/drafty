@@ -1,4 +1,4 @@
-import { PolicyKey } from "@policy-maker/core";
+import { PolicyKey } from "@policy-maker-old/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { TypeOf, ZodType } from "zod";
 import { useCallback } from "react";

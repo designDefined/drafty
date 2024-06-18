@@ -1,6 +1,6 @@
 import { viewPolicy } from "@core/policy/view";
 import { UserRepository } from "@/core/repository/user";
-import { useView } from "@policy-maker/react";
+import { useView } from "@policy-maker-old/react";
 
 export default function MyInformation() {
   const { data } = useView({
