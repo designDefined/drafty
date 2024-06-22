@@ -290,6 +290,20 @@ const subscribe = <T>(
   return { unsubscribe: () => unsubscribe(key, subscriptionKey) };
 };
 
+const subscribeSync = <T>(
+  key: string,
+  subscriptionKey: string,
+  listener: () => void,
+  from: () => T,
+  config: StoreConfig,
+) => {
+  const prev = _get<T>(key);
+  if (!prev || prev.status === "REJECTED") initSync(key, from, config);
+  prev?.subscriptions.set(subscriptionKey, listener);
+  listener();
+  return { unsubscribe: () => unsubscribe(key, subscriptionKey) };
+};
+
 const parseIntent = <Next extends IntentNext>(next: Next) => {
   if (!next) return;
   if (next.type === "EXECUTE") return next.callback();
@@ -318,6 +332,7 @@ export const store = {
   setAsync,
   invalidate,
   subscribe,
+  subscribeSync,
   unsubscribe,
   parseIntent,
 };

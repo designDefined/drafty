@@ -1,6 +1,9 @@
-import { StoreConfig, store } from "@policy-maker/core";
+"use client";
+
+import { StoreConfig } from "@policy-maker/core";
 import { useMemo, useEffect, useCallback, useState } from "react";
 import { nanoid } from "nanoid";
+import { useStoreContext } from "./storeContext";
 
 const defaultStoreConfig: StoreConfig = {
   staleTime: Infinity,
@@ -12,6 +15,7 @@ export const useStore = <T>(
   from: (prev?: T) => T | Promise<T>,
   inputConfig?: Partial<StoreConfig>,
 ) => {
+  const store = useStoreContext();
   const config = useMemo(
     () => ({ ...defaultStoreConfig, ...inputConfig }),
     [key],
@@ -51,6 +55,7 @@ const defaultSyncStoreConfig: StoreConfig = {
 };
 
 export const useSyncStore = <T>(key: string, from: (prev?: T) => T) => {
+  const store = useStoreContext();
   const subscriptionKey = useMemo(() => key + nanoid(), [key]);
   const [count, rerender] = useState(0);
 

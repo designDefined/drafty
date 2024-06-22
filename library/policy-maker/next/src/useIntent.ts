@@ -26,13 +26,11 @@ export const useIntent = <Input, Output>({
         set((prev) => ({ isWorking: true, error: prev?.error ?? null }));
         const raw = await to(policy.model.input.parse(input));
         const output = policy.model.output.parse(raw);
-
         policy.next &&
           policy.next({ input, output }).forEach(store.parseIntent);
         set(() => ({ isWorking: false, error: null }));
         return output;
       } catch (e) {
-        console.error(e);
         set(() => ({ isWorking: false, error: e }));
         policy.catch &&
           policy.catch({ input, error: e }).forEach(store.parseIntent);
