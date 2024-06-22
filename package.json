@@ -6,7 +6,8 @@
     "dialog": "yarn workspace @client/dialog",
     "mock": "yarn workspace mock",
     "initialize-db": "yarn mock initialize",
-    "dev:dialog": "concurrently \"yarn mock dialog\" \"yarn dialog dev\""
+    "dev:dialog": "concurrently \"yarn mock dialog\" \"yarn dialog dev\"",
+    "lib:fluid": "yarn workspace fluid"
   },
   "workspaces": [
     "library/**/*",
