@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
-import RootLayout from "./ui/layout";
-import HomeLayout from "./ui/home/layout";
-import Home from "./ui/home/page";
+import RootLayout from "./ui/RootLayout";
+import HomeLayout from "./ui/home/layout/HomeLayout";
+import Home from "./ui/home/page/Home";
+import Playground from "./ui/playground/page/Playground";
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,7 @@ const router = createBrowserRouter([
       },
       {
         path: "playground",
-        element: <div>working in progress</div>,
+        element: <Playground />,
       },
     ],
   },

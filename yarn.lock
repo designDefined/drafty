@@ -664,17 +664,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@policy-maker-old/core@workspace:^, @policy-maker-old/core@workspace:library/policy-maker-old/core":
+"@policy-maker-old/core@workspace:^, @policy-maker-old/core@workspace:library/deprecated/policy-maker-old/core":
   version: 0.0.0-use.local
-  resolution: "@policy-maker-old/core@workspace:library/policy-maker-old/core"
+  resolution: "@policy-maker-old/core@workspace:library/deprecated/policy-maker-old/core"
   peerDependencies:
     zod: ^3.22.4
   languageName: unknown
   linkType: soft
 
-"@policy-maker-old/react@workspace:^, @policy-maker-old/react@workspace:library/policy-maker-old/react":
+"@policy-maker-old/react@workspace:^, @policy-maker-old/react@workspace:library/deprecated/policy-maker-old/react":
   version: 0.0.0-use.local
-  resolution: "@policy-maker-old/react@workspace:library/policy-maker-old/react"
+  resolution: "@policy-maker-old/react@workspace:library/deprecated/policy-maker-old/react"
   dependencies:
     fast-deep-equal: "npm:^3.1.3"
     use-debounce: "npm:^10.0.0"
@@ -696,6 +696,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@policy-maker/next@workspace:library/policy-maker/next":
+  version: 0.0.0-use.local
+  resolution: "@policy-maker/next@workspace:library/policy-maker/next"
+  peerDependencies:
+    "@policy-maker/core": "workspace:*"
+    react: ^18.0.0
+    react-dom: ^18.0.0
+    zod: ^3.23.0
+  languageName: unknown
+  linkType: soft
+
 "@policy-maker/react@workspace:library/policy-maker/react":
   version: 0.0.0-use.local
   resolution: "@policy-maker/react@workspace:library/policy-maker/react"
@@ -707,17 +718,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@pvi/core@workspace:library/pvi/core":
+"@pvi/core@workspace:library/deprecated/pvi/core":
   version: 0.0.0-use.local
-  resolution: "@pvi/core@workspace:library/pvi/core"
+  resolution: "@pvi/core@workspace:library/deprecated/pvi/core"
   dependencies:
     zod: "npm:^3.22.4"
   languageName: unknown
   linkType: soft
 
-"@pvi/react@workspace:library/pvi/react":
+"@pvi/react@workspace:library/deprecated/pvi/react":
   version: 0.0.0-use.local
-  resolution: "@pvi/react@workspace:library/pvi/react"
+  resolution: "@pvi/react@workspace:library/deprecated/pvi/react"
   peerDependencies:
     "@pvi/core": "workspace:^"
     "@tanstack/react-query": ^5.14.1
@@ -2262,6 +2273,10 @@ __metadata:
     react-router-dom: "npm:^6.23.1"
     typescript: "npm:^5.2.2"
     vite: "npm:^5.2.0"
+    vite-tsconfig-paths: "npm:^4.3.2"
+  peerDependencies:
+    react: ^18.2.0
+    react-dom: ^18.2.0
   languageName: unknown
   linkType: soft
 

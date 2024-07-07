@@ -1,0 +1,27 @@
+.Default {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  font: inherit;
+  transition: 0.1s ease;
+  cursor: pointer;
+}
+.Default.stroked {
+  border-color: black;
+}
+.Default.filled {
+  color: white;
+  background-color: black;
+}
+.Default:hover {
+  transform: scale(1.02);
+}
+.Default:active {
+  transform: scale(0.98);
+}
+.Default.filled:hover {
+  opacity: 0.8;
+}
+.Default.filled:active {
+  opacity: 0.6;
+}
