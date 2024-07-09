@@ -5,7 +5,6 @@ import { useStore } from "./useStore";
 export const useViewMaybe = <T>({
   policy,
   from,
-  config,
 }: {
   policy: ViewPolicy<T>;
   from: (prev?: T) => T | Promise<T>;

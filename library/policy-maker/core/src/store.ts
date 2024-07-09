@@ -10,6 +10,7 @@ export type LifecycleConfig = {
   gcTime: number | null;
 };
 export type LifecycleContext = {
+  staleAt: number;
   lastFetchedAt: number;
   gcTimer: number;
 };
@@ -76,8 +77,8 @@ const isFetching = <T>(
 
 const isStale = <T>(snapshot: Stored<T>) => {
   if (isFetching(snapshot)) return false;
-  if (!snapshot.staleTime || !snapshot.lastFetchedAt) return true;
-  return snapshot.lastFetchedAt + snapshot.staleTime < Date.now();
+  if (!snapshot.staleAt) return false;
+  return snapshot.staleAt <= Date.now();
 };
 
 /*
@@ -140,12 +141,14 @@ const pend = <T>(
 const resolve = <T>(key: string, value: T): Resolved<T> | undefined => {
   const prev = _get<T>(key);
   if (!prev) return;
+  const now = Date.now();
   return _set<T, Resolved<T>>(key, {
     ...prev,
     status: "RESOLVED",
     value: value,
     error: undefined,
-    lastFetchedAt: Date.now(),
+    lastFetchedAt: now,
+    staleAt: prev.staleTime ? now + prev.staleTime : undefined,
   });
 };
 
@@ -157,6 +160,7 @@ const reject = (key: string, error: unknown) => {
     status: "REJECTED",
     error,
     lastFetchedAt: Date.now(),
+    staleAt: undefined,
   });
 };
 
@@ -248,7 +252,7 @@ const refresh = <T>(key: string) => {
 const staleCached = <T>(key: string) => {
   const cached = _get<T>(key);
   if (!cached || !isCached(cached)) return;
-  return _set<T>(key, { ...cached, staleTime: 0 });
+  return _set<T>(key, { ...cached, staleAt: 1 }); // Set stale at to 1 to force refresh
 };
 
 /* Intent Next */

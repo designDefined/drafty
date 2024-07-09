@@ -7,6 +7,7 @@ export * from "./src/useStore";
  * View
  */
 export * from "./src/useView";
+export * from "./src/useViewMaybe";
 
 /*
  * Input
