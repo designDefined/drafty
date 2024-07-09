@@ -3,7 +3,8 @@
   border-radius: 8px;
   background-color: transparent;
   font: inherit;
-  transition: 0.1s ease;
+  transition: 0.2s cubic-bezier(0.2, 0.3, 0.2, 1.6) transform;
+
   cursor: pointer;
 }
 .Default.stroked {
@@ -14,10 +15,10 @@
   background-color: black;
 }
 .Default:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 .Default:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 .Default.filled:hover {
   opacity: 0.8;
