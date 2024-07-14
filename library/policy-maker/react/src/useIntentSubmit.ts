@@ -43,20 +43,23 @@ export const useIntentSubmit = <Input extends Record<string, unknown>, Output>({
 
   const reset = useCallback(() => set(() => ({})), [policy.key]);
 
-  const submit = useCallback(async () => {
-    try {
-      const submitValue = { ...get.value };
-      if (!config.allowEmpty && isEmpty(get.value))
-        throw new Error("Empty input is not allowed");
-      if (config.resetImmediate) reset();
-      const parsed = policy.model.input.parse(submitValue);
-      const output = await send(parsed);
-      if (!config.resetImmediate) reset();
-      return output;
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }, [policy.key, get.value]);
+  const submit = useCallback(
+    async (baseValue?: Partial<Input>) => {
+      try {
+        const submitValue = { ...baseValue, ...get.value };
+        if (!config.allowEmpty && isEmpty(get.value))
+          throw new Error("Empty input is not allowed");
+        if (config.resetImmediate) reset();
+        const parsed = policy.model.input.parse(submitValue);
+        const output = await send(parsed);
+        if (!config.resetImmediate) reset();
+        return output;
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    },
+    [policy.key, get.value],
+  );
 
   return {
     inputValues: get.value,
@@ -65,5 +68,6 @@ export const useIntentSubmit = <Input extends Record<string, unknown>, Output>({
     error,
     isWorking,
     submit,
+    reset,
   };
 };
