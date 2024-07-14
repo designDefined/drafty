@@ -4,45 +4,86 @@ import { CSSProperties, useMemo, useRef } from "react";
  * types
  */
 
-type FlexDirectionValue = "row" | "row-reverse" | "column" | "column-reverse";
-type FlexWrapValue = "nowrap" | "wrap" | "wrap-reverse";
+/* simple */
+type Value = number | string | undefined;
 
-type FlexJustifyValue =
+/* flex */
+type FlexDirection =
+  | "row"
+  | "row-reverse"
+  | "column"
+  | "column-reverse"
+  | undefined;
+type FlexWrap = "nowrap" | "wrap" | "wrap-reverse" | undefined;
+
+/* justify */
+type FlexJustify =
   | "start"
   | "center"
   | "end"
   | "space-between"
   | "space-around"
-  | "space-evenly";
+  | "space-evenly"
+  | undefined;
+type FlexJustifyMax = Value;
+type FlexJustifyMin = Value;
 
-type FlexAlignValue = "start" | "center" | "end" | "stretch" | "baseline";
+/* align */
+type FlexAlign =
+  | "start"
+  | "center"
+  | "end"
+  | "stretch"
+  | "baseline"
+  | undefined;
+type FlexAlignMax = Value;
+type FlexAlignMin = Value;
 
-type Padding = number | string | undefined;
-type Gap = number | string | undefined;
-type Margin = number | string | undefined;
+/* spacing */
+type Padding = Value;
+type Gap = Value;
+type Margin = Value;
 
 export type FluidStyle = {
   flex?: [number, number, string];
-  flow?: [FlexDirectionValue, FlexWrapValue, FlexAlignValue, FlexJustifyValue];
-  spacing?: [Padding] | [Padding, Gap] | [Padding, Gap, Margin];
+  flow?:
+    | [FlexDirection, FlexWrap, FlexAlign, FlexJustify]
+    | [FlexDirection, FlexWrap, FlexAlign]
+    | [FlexDirection, FlexWrap]
+    | [FlexDirection];
+  align?:
+    | [FlexAlign, FlexAlignMax, FlexAlignMin]
+    | [FlexAlign, FlexAlignMax]
+    | [FlexAlign];
+  justify?:
+    | [FlexJustify, FlexJustifyMax, FlexJustifyMin]
+    | [FlexJustify, FlexAlignMax]
+    | [FlexJustify];
+  spacing?: [Padding, Gap, Margin] | [Padding, Gap] | [Padding];
   isInline?: boolean;
+};
+
+/*
+ * default
+ */
+const defaultFluidStyle: Required<FluidStyle> = {
+  flex: [1, 1, "auto"],
+  flow: ["column", "nowrap"],
+  align: [undefined],
+  justify: [undefined],
+  spacing: [undefined],
+  isInline: false,
 };
 
 /*
  * hooks
  */
-
-const defaultFluidStyle: Required<FluidStyle> = {
-  flex: [1, 1, "auto"],
-  flow: ["column", "nowrap", "stretch", "start"],
-  spacing: [undefined, undefined, undefined],
-  isInline: false,
-};
-
 export const useFluidStyle = (style: FluidStyle, override?: CSSProperties) => {
   const {
     flex: [grow, shrink, basis],
-    flow: [direction, wrap, align, justify],
+    flow: [direction, wrap, alignAlias, justifyAlias],
+    align: [align, alignMax, alignMin],
+    justify: [justify, justifyMax, justifyMin],
     spacing: [padding, gap, margin],
     isInline,
   } = Object.keys(defaultFluidStyle).reduce((acc, _key) => {
@@ -52,6 +93,14 @@ export const useFluidStyle = (style: FluidStyle, override?: CSSProperties) => {
   }, {} as Required<FluidStyle>);
 
   const overrideRef = useRef(override);
+  const { alignKey, justifyKey } = useMemo(() => {
+    const isVertical = direction === "column" || direction === "column-reverse";
+    return {
+      alignKey: isVertical ? "Width" : "Height",
+      justifyKey: isVertical ? "Height" : "Width",
+    };
+  }, [direction]);
+  console.log(alignKey, justifyKey);
 
   const styleObject: CSSProperties = useMemo(
     () => ({
@@ -59,8 +108,12 @@ export const useFluidStyle = (style: FluidStyle, override?: CSSProperties) => {
       overflow: "auto",
       flex: `${grow} ${shrink} ${basis}`,
       flexFlow: `${direction} ${wrap}`,
-      alignItems: `${align}`,
-      justifyContent: `${justify}`,
+      alignItems: `${align ?? alignAlias}`,
+      justifyContent: `${justify ?? justifyAlias}`,
+      [`max${alignKey}`]: alignMax,
+      [`min${alignKey}`]: alignMin,
+      [`max${justifyKey}`]: justifyMax,
+      [`min${justifyKey}`]: justifyMin,
       gap,
       padding,
       margin,
@@ -73,11 +126,19 @@ export const useFluidStyle = (style: FluidStyle, override?: CSSProperties) => {
       basis,
       direction,
       wrap,
+      alignAlias,
+      justifyAlias,
       align,
       justify,
       padding,
       gap,
       margin,
+      alignKey,
+      alignMax,
+      alignMin,
+      justifyKey,
+      justifyMax,
+      justifyMin,
     ],
   );
 

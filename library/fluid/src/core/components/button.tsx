@@ -14,6 +14,8 @@ export function Button({
   style,
   flex,
   flow,
+  align,
+  justify,
   spacing,
   isInline,
   className,
@@ -21,7 +23,10 @@ export function Button({
   // rest
   ...props
 }: ButtonComponentProps) {
-  const memoizedStyle = useFluidStyle({ flex, flow, spacing, isInline }, style);
+  const memoizedStyle = useFluidStyle(
+    { flex, flow, align, justify, spacing, isInline },
+    style,
+  );
   const memoizedClasses = useFluidClass({ ...props, className });
 
   return (

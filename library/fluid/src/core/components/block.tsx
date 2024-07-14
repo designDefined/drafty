@@ -14,6 +14,8 @@ export function Div({
   style,
   flex,
   flow,
+  justify,
+  align,
   spacing,
   isInline,
   className,
@@ -21,7 +23,10 @@ export function Div({
   // rest
   ...props
 }: BlockComponentProps) {
-  const memoizedStyle = useFluidStyle({ flex, flow, spacing, isInline }, style);
+  const memoizedStyle = useFluidStyle(
+    { flex, flow, spacing, justify, align, isInline },
+    style,
+  );
   const memoizedClasses = useFluidClass({ ...props, className });
 
   return (
@@ -39,6 +44,8 @@ export function Main({
   style,
   flex,
   flow,
+  justify,
+  align,
   spacing,
   isInline,
   className,
@@ -46,7 +53,10 @@ export function Main({
   // rest
   ...props
 }: BlockComponentProps) {
-  const memoizedStyle = useFluidStyle({ flex, flow, spacing, isInline }, style);
+  const memoizedStyle = useFluidStyle(
+    { flex, flow, spacing, justify, align, isInline },
+    style,
+  );
   const memoizedClasses = useFluidClass({ ...props, className });
 
   return (
@@ -64,6 +74,8 @@ export function Article({
   style,
   flex,
   flow,
+  justify,
+  align,
   spacing,
   isInline,
   className,
@@ -71,7 +83,10 @@ export function Article({
   // rest
   ...props
 }: BlockComponentProps) {
-  const memoizedStyle = useFluidStyle({ flex, flow, spacing, isInline }, style);
+  const memoizedStyle = useFluidStyle(
+    { flex, flow, spacing, justify, align, isInline },
+    style,
+  );
   const memoizedClasses = useFluidClass({ ...props, className });
 
   return (
@@ -89,6 +104,8 @@ export function Section({
   style,
   flex,
   flow,
+  justify,
+  align,
   spacing,
   isInline,
   className,
@@ -96,7 +113,10 @@ export function Section({
   // rest
   ...props
 }: BlockComponentProps) {
-  const memoizedStyle = useFluidStyle({ flex, flow, spacing, isInline }, style);
+  const memoizedStyle = useFluidStyle(
+    { flex, flow, spacing, justify, align, isInline },
+    style,
+  );
   const memoizedClasses = useFluidClass({ ...props, className });
 
   return (
@@ -114,6 +134,8 @@ export function P({
   style,
   flex,
   flow,
+  justify,
+  align,
   spacing,
   isInline,
   className,
@@ -121,7 +143,10 @@ export function P({
   // rest
   ...props
 }: BlockComponentProps) {
-  const memoizedStyle = useFluidStyle({ flex, flow, spacing, isInline }, style);
+  const memoizedStyle = useFluidStyle(
+    { flex, flow, spacing, justify, align, isInline },
+    style,
+  );
   const memoizedClasses = useFluidClass({ ...props, className });
 
   return (

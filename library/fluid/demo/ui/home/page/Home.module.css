@@ -1,17 +1,16 @@
-.Home {
-  width: 100vw;
-  height: 100vh;
-}
-
-.Home .title {
+.title {
   color: black;
   font-size: 160px;
   font-weight: 500;
 }
 
-.Home .description {
+.description {
   font-size: 20px;
   font-weight: 300;
   line-height: 150%;
   text-align: center;
+}
+
+.strong {
+  font-weight: 600;
 }

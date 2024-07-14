@@ -14,6 +14,8 @@ export function Span({
   style,
   flex,
   flow,
+  align,
+  justify,
   spacing,
   isInline = true,
   className,
@@ -21,7 +23,10 @@ export function Span({
   // rest
   ...props
 }: InlineComponentProps) {
-  const memoizedStyle = useFluidStyle({ flex, flow, spacing, isInline }, style);
+  const memoizedStyle = useFluidStyle(
+    { flex, flow, align, justify, spacing, isInline },
+    style,
+  );
   const memoizedClasses = useFluidClass({ ...props, className });
 
   return (
