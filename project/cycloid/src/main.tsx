@@ -1,10 +1,12 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import { Via } from "@via/react";
+import { createStore } from "@via/core";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+const store = createStore();
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <Via store={store}>
     <App />
-  </React.StrictMode>,
-)
+  </Via>,
+);
