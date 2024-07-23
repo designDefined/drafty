@@ -8,6 +8,9 @@ import { CSSProperties, useMemo, useRef } from "react";
 type Value = number | string | undefined;
 
 /* flex */
+type FlexGrow = number;
+type FlexShrink = number;
+type FlexBasis = string;
 type FlexDirection =
   | "row"
   | "row-reverse"
@@ -45,7 +48,7 @@ type Gap = Value;
 type Margin = Value;
 
 export type FluidStyle = {
-  flex?: [number, number, string];
+  flex?: [FlexGrow, FlexShrink, FlexBasis];
   flow?:
     | [FlexDirection, FlexWrap, FlexAlign, FlexJustify]
     | [FlexDirection, FlexWrap, FlexAlign]
@@ -100,7 +103,6 @@ export const useFluidStyle = (style: FluidStyle, override?: CSSProperties) => {
       justifyKey: isVertical ? "Height" : "Width",
     };
   }, [direction]);
-  console.log(alignKey, justifyKey);
 
   const styleObject: CSSProperties = useMemo(
     () => ({

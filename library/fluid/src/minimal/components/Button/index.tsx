@@ -3,7 +3,7 @@ import {
   Button as _Button,
   ButtonComponentProps,
   useFluidClass,
-} from "@fluid/core";
+} from "../../../core";
 
 function Default({
   className,
