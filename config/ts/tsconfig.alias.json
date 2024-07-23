@@ -1,0 +1,5 @@
+{
+  "compilerOptions": {
+    "baseUrl": "../../" // To simplify path aliases, baseURL is always the root of the project.
+  }
+}
