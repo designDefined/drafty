@@ -1,0 +1,17 @@
+{
+  "name": "@via/react",
+  "version:": "0.0.1",
+  "type": "module",
+  "main": "index.ts",
+  "dependencies": {
+    "@via/core": "workspace:*",
+    "immer": "^10.1.1",
+    "lodash": "^4.17.21",
+    "nanoid": "^5.0.7",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.6"
+  }
+}
