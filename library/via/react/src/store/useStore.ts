@@ -1,33 +1,23 @@
 import { Setter, Store, StoredStatus, StoredValues } from "@via/core";
 import { nanoid } from "nanoid";
 import {
-  createContext,
-  PropsWithChildren,
   ReducerWithoutAction,
   useCallback,
   useContext,
   useEffect,
   useReducer,
 } from "react";
+import { ViaContext } from "./storeContext";
 
 type StoredState<T> = [StoredValues<T>, StoredStatus<T>];
 type StoredSet<T> = (setter: Setter<T> | Promise<Setter<T>>) => void;
 type UseStoreParams<T> = StoredStatus<T> & { value?: T };
 
-const Context = createContext<Store | null>(null);
-
-export const Via = ({
-  store,
-  children,
-}: PropsWithChildren & { store: Store }) => {
-  return <Context.Provider value={store}>{children}</Context.Provider>;
-};
-
-export const useStore = <T extends unknown>({
+export const useStore = <T>({
   key,
   ...params
-}: UseStoreParams<T>): [StoredState<T>, StoredSet<T>] => {
-  const store = useContext(Context);
+}: UseStoreParams<T>): [StoredState<T>, StoredSet<T>, Store] => {
+  const store = useContext(ViaContext);
   if (!store) throw new Error("useStore must be used within proper context");
 
   const [state, dispatch] = useReducer<
@@ -36,7 +26,7 @@ export const useStore = <T extends unknown>({
   >(
     (prev: StoredState<T>) => {
       const { values, status } = store.get<T>({ key, ...params });
-      return Object.is(values, prev[0]) && Object.is(status, prev[1])
+      return Object.is(values, prev[0]) && Object.is(status, prev[1]) // TODO: Add slice for rerender optimization
         ? prev
         : [values, status];
     },
@@ -49,7 +39,7 @@ export const useStore = <T extends unknown>({
 
   const set: StoredSet<T> = useCallback(
     (setter) => store.set<T>({ key, setter }),
-    [key],
+    [store, key],
   );
 
   useEffect(
@@ -59,8 +49,8 @@ export const useStore = <T extends unknown>({
         subscriptionKey: nanoid(),
         subscriber: dispatch,
       }),
-    [key],
+    [store, key],
   );
 
-  return [state, set];
+  return [state, set, store];
 };
