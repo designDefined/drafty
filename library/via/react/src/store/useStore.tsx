@@ -1,10 +1,4 @@
-import {
-  SetParams,
-  Setter,
-  Store,
-  StoredStatus,
-  StoredValues,
-} from "@via/core";
+import { Setter, Store, StoredStatus, StoredValues } from "@via/core";
 import { nanoid } from "nanoid";
 import {
   createContext,
