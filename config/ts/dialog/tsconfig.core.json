@@ -1,9 +1,0 @@
-{
-  "extends": "../tsconfig.common.json",
-  "compilerOptions": {
-    /* Path alias */
-    "paths": {
-      "@core/*": ["./core/dialog/*"]
-    }
-  }
-}

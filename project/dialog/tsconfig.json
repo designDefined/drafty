@@ -1,5 +1,11 @@
 {
-  "extends": "../../config/ts/dialog/tsconfig.client.json",
+  "extends": "../../config/ts/vite-react/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@/*": ["src/*"]
+    }
+  },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "deprecated"],
   "references": [{ "path": "./tsconfig.node.json" }]

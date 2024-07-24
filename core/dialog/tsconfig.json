@@ -1,4 +1,0 @@
-{
-  "extends": "../../config/ts/dialog/tsconfig.core.json",
-  "include": ["**/*.ts"]
-}
