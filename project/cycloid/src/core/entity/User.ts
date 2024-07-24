@@ -5,3 +5,16 @@ export type User = {
   name: string;
   hobbies: Hobby[];
 };
+
+export type UserDetail = User & {
+  statistics: {
+    todo: {
+      date: string;
+      counts: {
+        total: number;
+        completed: number;
+        uncompleted: number;
+      };
+    };
+  };
+};

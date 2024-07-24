@@ -5,6 +5,10 @@ import { Div, Span } from "fluid";
 import { TodosView } from "../../core/view/todos";
 import TodoItem from "./TodoItem";
 
+import "../../core/intent/addTodo";
+import MyDetail from "./MyDetail";
+import AddTodoInput from "./AddTodoInput";
+
 export default function ViewIntentTest() {
   const [counts, setCounts] = useState({ status: 0, todos: 0, update: 0 });
 
@@ -45,6 +49,8 @@ export default function ViewIntentTest() {
           <TodoItem todo={todo} index={index} key={todo.id} />
         ))}
       </Div>
+      <AddTodoInput />
+      <MyDetail />
     </Div>
   );
 }

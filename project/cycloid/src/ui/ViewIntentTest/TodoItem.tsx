@@ -15,7 +15,8 @@ export default function TodoItem({ todo, index }: TodoProps) {
       spacing={[4, 8]}
       className="sans"
     >
-      {index + 1}. {todo.content}{" "}
+      {index + 1}. {todo.content} ({todo.date.year}.{todo.date.month}.
+      {todo.date.day}.)
       <input
         type="checkbox"
         checked={todo.isCompleted}
