@@ -107,7 +107,7 @@ export const useFluidStyle = (style: FluidStyle, override?: CSSProperties) => {
   const styleObject: CSSProperties = useMemo(
     () => ({
       display: isInline ? "inline-flex" : "flex",
-      overflow: "auto",
+      // overflow: "auto",
       flex: `${grow} ${shrink} ${basis}`,
       flexFlow: `${direction} ${wrap}`,
       alignItems: `${align ?? alignAlias}`,
