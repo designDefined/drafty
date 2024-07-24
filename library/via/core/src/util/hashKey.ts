@@ -1,6 +1,13 @@
 import { Falsy } from "./falsy";
 
+/**
+ * Key used in `Map` such as `store` or `subscribers`
+ */
 export type Key = string;
+/**
+ * More flexible key used in `view` and `intent` to be combined with object-like dependencies.
+ * Similar to query keys used in `@tanstack/react-query`
+ */
 export type RawKey = string | number | Record<string, unknown>;
 
 const hashKey = (target: RawKey | Falsy): Key => {

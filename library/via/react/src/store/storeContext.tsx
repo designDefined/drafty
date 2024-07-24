@@ -1,4 +1,4 @@
-import { Store } from "library/via/core";
+import { Store } from "@via/core";
 import { createContext, PropsWithChildren } from "react";
 
 // context

@@ -1,7 +1,6 @@
 import { useCallback, useRef } from "react";
-import { Intent, IntentParams, IntentValues } from "@via/core";
+import { Intent, IntentParams, StoredIntent, isPromise } from "@via/core";
 import { useStore } from "../store";
-import { isPromise } from "@via/core";
 
 type UseIntentParams<I, O> = {
   intent: Intent<I, O>;
@@ -16,9 +15,10 @@ export const useIntent = <I, O>({
   const storeStatusRef = useRef({ ...intentStatus, ...overrideStatus });
   const toRef = useRef(to ?? overrideTo);
   const nextRef = useRef(next ?? overrideNext);
-  const [[intent, status], set, store] = useStore<IntentValues<I, O>>({
+  const [[intent, status], set, store] = useStore<StoredIntent<I, O>>({
     ...storeStatusRef.current,
     model: undefined,
+    from: undefined,
     value: { isWorking: false },
   });
 

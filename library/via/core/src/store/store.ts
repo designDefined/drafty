@@ -1,11 +1,14 @@
 import { produce } from "immer";
 import { Key } from "../util/hashKey";
 import { isPromise } from "../util/promise";
+import { DeepPartial } from "../util/deep";
+import merge from "lodash/merge";
+import cloneDeep from "lodash/cloneDeep";
 
 // Types
 export type Model<T> = (input: unknown) => T;
 export type From<T> = () => T | Promise<T>;
-export type Setter<T> = T | Partial<T> | ((draft: T) => void);
+export type Setter<T> = T | DeepPartial<T> | ((draft: T) => void);
 export type SetterConfig = { override?: boolean };
 
 export type StoredValues<T> = {
@@ -104,7 +107,8 @@ export const createStore = () => {
         ...values,
         value: produce(values.value, setter as (draft: T) => void),
       };
-    else newValues = { ...values, value: { ...values.value, ...setter } };
+    else
+      newValues = { ...values, value: merge(cloneDeep(values.value), setter) };
 
     stored.values = newValues;
     stored.updatedAt = Date.now();
