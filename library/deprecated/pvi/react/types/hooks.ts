@@ -2,7 +2,7 @@ import {
   QueryConfigs,
   SuspenseQueryConfigs,
 } from "../adapter/react-query/configs";
-import { ZodAnyObject } from "../../core/adapter/zod/types";
+import { ZodAnyObject } from "@pvi/core/adapter/zod/types";
 import { ViewModel, ViewPolicy, ViewPolicyRecords } from "@pvi/core/types/view";
 import {
   IntentModel,

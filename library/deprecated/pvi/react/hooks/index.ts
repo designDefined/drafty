@@ -17,7 +17,7 @@ import {
 import {
   AnyIntentPolicyDraftRecords,
   AnyViewPolicyDraftRecords,
-} from "../../core/types/typesAny";
+} from "@pvi/core/types/typesAny";
 import { TypeOf, ZodType } from "zod";
 
 const defaultViewQueryConfigs: SuspenseQueryConfigs = {

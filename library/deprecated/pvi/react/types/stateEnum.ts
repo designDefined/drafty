@@ -1,5 +1,5 @@
 import { TypeOf } from "zod";
-import { ViewModel } from "../../core/types/view";
+import { ViewModel } from "@pvi/core/types/view";
 
 export type ViewStateEnum<Model extends ViewModel> =
   | {
