@@ -17,7 +17,7 @@ export const useIntentInput = <I, O>({
   intent: { key, model, from },
   from: fromOverride,
 }: UseIntentInputParams<I, O>) => {
-  const modelTreeRef = useRef(model?.input);
+  const modelTreeRef = useRef(model?.tree);
   const [[state], setInternal, store] = useStore<InputTree<I>>({
     key: "input_" + key,
     from: () => {

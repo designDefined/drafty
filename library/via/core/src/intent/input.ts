@@ -128,12 +128,15 @@ export const getValueFromInputTree = <T>(tree: InputTree<T>): T => {
   }, {} as T);
 };
 
-export const getInputFromInputTree = <T>(
+export const getValidInputFromInputTree = <T>(
   tree: InputTree<T>,
 ): DeepPartial<T> => {
-  if (isInputLeaf(tree)) return tree.input as DeepPartial<T>;
+  if (isInputLeaf(tree)) {
+    if (tree.error) throw tree.error;
+    return tree.input as DeepPartial<T>;
+  }
   if (Array.isArray(tree))
-    return tree.map(getInputFromInputTree) as unknown as DeepPartial<T>;
+    return tree.map(getValidInputFromInputTree) as unknown as DeepPartial<T>;
   return Object.keys(tree).reduce((acc, key) => {
     acc[key as keyof T] = getValueFromInputTree(
       (tree as Record<string, InputTree<any>>)[key],

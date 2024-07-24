@@ -19,5 +19,5 @@ export const AddTodoIntent = Intent<AddTodoInput, boolean>(() => ({
     return true;
   },
   from: () => ({ content: "", date: { year: 2024, month: 7, day: 24 } }),
-  model: { input: zodUtil.deepParse(AddTodoInput), output: z.boolean().parse },
+  model: { tree: zodUtil.deepParse(AddTodoInput), output: z.boolean().parse },
 }));

@@ -9,7 +9,11 @@ import cloneDeep from "lodash/cloneDeep";
 export type Model<T> = (input: unknown) => T;
 export type From<T> = () => T | Promise<T>;
 export type Setter<T> = T | DeepPartial<T> | ((draft: T) => void);
-export type SetterConfig = { override?: boolean };
+export type SetterConfig = {
+  override?: boolean;
+  clearPromise?: boolean;
+  error?: unknown;
+};
 
 export type StoredValues<T> = {
   value?: T;
@@ -99,17 +103,26 @@ export const createStore = () => {
     const { values, status } = stored;
     let newValues: StoredValues<T>;
 
-    if (config?.override && typeof setter !== "function")
-      newValues = { ...values, value: setter as T };
-    else if (!values.value) return;
-    else if (typeof setter === "function")
-      newValues = {
-        ...values,
-        value: produce(values.value, setter as (draft: T) => void),
-      };
-    else
-      newValues = { ...values, value: merge(cloneDeep(values.value), setter) };
+    try {
+      if (config?.override && typeof setter !== "function")
+        newValues = { ...values, value: setter as T };
+      else if (!values.value) return;
+      else if (typeof setter === "function")
+        newValues = {
+          ...values,
+          value: produce(values.value, setter as (draft: T) => void),
+        };
+      else
+        newValues = {
+          ...values,
+          value: merge(cloneDeep(values.value), setter),
+        };
+    } catch (e) {
+      newValues = { ...values, error: e };
+    }
 
+    if (config?.clearPromise) newValues.promise = undefined;
+    if (config?.error) newValues.error = config.error;
     stored.values = newValues;
     stored.updatedAt = Date.now();
     stored.subscribers.forEach((cb) => cb([newValues, status]));
@@ -119,12 +132,19 @@ export const createStore = () => {
     const stored = _read<T>({ key });
     if (!stored) return;
 
-    stored.values.promise = promise;
-    promise.then((setter) => {
-      _update({ key, setter, config });
-    });
+    stored.values.promise = promise
+      .then((setter) =>
+        _update({ key, setter, config: { ...config, clearPromise: true } }),
+      )
+      .catch((e) =>
+        _update({
+          key,
+          setter: () => {},
+          config: { ...config, clearPromise: true, error: e },
+        }),
+      );
 
-    const newValues = { ...stored.values, promise };
+    const newValues = { ...stored.values, promise, config };
     stored.values = newValues;
     stored.subscribers.forEach((cb) => cb([newValues, stored.status]));
   };

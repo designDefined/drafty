@@ -1,4 +1,10 @@
-import { Setter, Store, StoredStatus, StoredValues } from "@via/core";
+import {
+  Setter,
+  SetterConfig,
+  Store,
+  StoredStatus,
+  StoredValues,
+} from "@via/core";
 import { nanoid } from "nanoid";
 import {
   ReducerWithoutAction,
@@ -10,7 +16,10 @@ import {
 import { ViaContext } from "./storeContext";
 
 type StoredState<T> = [StoredValues<T>, StoredStatus<T>];
-type StoredSet<T> = (setter: Setter<T> | Promise<Setter<T>>) => void;
+type StoredSet<T> = (
+  setter: Setter<T> | Promise<Setter<T>>,
+  config?: SetterConfig,
+) => void;
 type UseStoreParams<T> = StoredStatus<T> & { value?: T };
 
 export const useStore = <T>({
@@ -38,7 +47,7 @@ export const useStore = <T>({
   );
 
   const set: StoredSet<T> = useCallback(
-    (setter) => store.set<T>({ key, setter }),
+    (setter, config) => store.set<T>({ key, setter, config }),
     [store, key],
   );
 

@@ -3,7 +3,11 @@ import { Falsy } from "../util/falsy";
 import { hashKeys, RawKey } from "../util/hashKey";
 import { ModelTree } from "./input";
 
-export type IOModel<I, O> = { input?: ModelTree<I>; output?: Model<O> };
+export type IOModel<I, O> = {
+  tree?: ModelTree<I>;
+  input?: Model<I>;
+  output?: Model<O>;
+};
 export type To<I, O> = (input: I) => O | Promise<O>;
 export type Next = (store: Store) => void;
 export type IntentParams<I, O> = {
