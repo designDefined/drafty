@@ -1,10 +1,9 @@
+import "./style/index.css";
 import ReactDOM from "react-dom/client";
 import { Via } from "@via/react";
 import { createStore } from "@via/core";
-import "./index.css";
-import "./styles.css";
 import { RouterProvider } from "react-router-dom";
-import { router } from "./router/index.tsx";
+import { router } from "./router";
 
 const store = createStore();
 

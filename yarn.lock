@@ -691,7 +691,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@policy-maker-old/core@workspace:^, @policy-maker-old/core@workspace:library/deprecated/policy-maker-old/core":
+"@policy-maker-old/core@workspace:library/deprecated/policy-maker-old/core":
   version: 0.0.0-use.local
   resolution: "@policy-maker-old/core@workspace:library/deprecated/policy-maker-old/core"
   peerDependencies:
@@ -699,7 +699,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@policy-maker-old/react@workspace:^, @policy-maker-old/react@workspace:library/deprecated/policy-maker-old/react":
+"@policy-maker-old/react@workspace:library/deprecated/policy-maker-old/react":
   version: 0.0.0-use.local
   resolution: "@policy-maker-old/react@workspace:library/deprecated/policy-maker-old/react"
   dependencies:
@@ -745,12 +745,35 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@project/cycloid@workspace:project/cycloid":
+  version: 0.0.0-use.local
+  resolution: "@project/cycloid@workspace:project/cycloid"
+  dependencies:
+    "@fluid/core": "workspace:^"
+    "@fluid/minimal": "workspace:^"
+    "@types/react": "npm:^18.2.66"
+    "@types/react-dom": "npm:^18.2.22"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    "@typescript-eslint/parser": "npm:^7.2.0"
+    "@via/core": "workspace:^"
+    "@via/react": "workspace:^"
+    "@vitejs/plugin-react": "npm:^4.2.1"
+    eslint: "npm:^8.57.0"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
+    eslint-plugin-react-refresh: "npm:^0.4.6"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    react-router-dom: "npm:^6.25.1"
+    typescript: "npm:^5.2.2"
+    vite: "npm:^5.2.0"
+    zod: "npm:^3.23.8"
+  languageName: unknown
+  linkType: soft
+
 "@project/dialog@workspace:project/dialog":
   version: 0.0.0-use.local
   resolution: "@project/dialog@workspace:project/dialog"
   dependencies:
-    "@policy-maker-old/core": "workspace:^"
-    "@policy-maker-old/react": "workspace:^"
     "@tanstack/react-query": "npm:^5.28.9"
     "@types/react": "npm:^18.2.66"
     "@types/react-dom": "npm:^18.2.22"
@@ -803,6 +826,13 @@ __metadata:
   version: 1.16.1
   resolution: "@remix-run/router@npm:1.16.1"
   checksum: 10c0/5f1b0aef4924830eeab9c86dcaa5af8157066e5de65b449e7fdf406532b2384828a46a447c31b0735fd713a06938dd88bfd4e566d9989be70c770457dda16c92
+  languageName: node
+  linkType: hard
+
+"@remix-run/router@npm:1.18.0":
+  version: 1.18.0
+  resolution: "@remix-run/router@npm:1.18.0"
+  checksum: 10c0/3ec7e441a0e54932a3d3bf932432094420f2c117715d80a5454bc7e55d13b91250749942aab032cd07aee191f1c1de33fede8682025bfd3a453dd207c016e140
   languageName: node
   linkType: hard
 
@@ -1162,6 +1192,32 @@ __metadata:
     immer: "npm:^10.1.1"
     lodash: "npm:^4.17.21"
     nanoid: "npm:^5.0.7"
+  languageName: unknown
+  linkType: soft
+
+"@via/demo@workspace:library/via/demo":
+  version: 0.0.0-use.local
+  resolution: "@via/demo@workspace:library/via/demo"
+  dependencies:
+    "@fluid/core": "workspace:^"
+    "@fluid/minimal": "workspace:^"
+    "@types/react": "npm:^18.2.66"
+    "@types/react-dom": "npm:^18.2.22"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    "@typescript-eslint/parser": "npm:^7.2.0"
+    "@via/core": "workspace:^"
+    "@via/react": "workspace:^"
+    "@vitejs/plugin-react": "npm:^4.2.1"
+    eslint: "npm:^8.57.0"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
+    eslint-plugin-react-refresh: "npm:^0.4.6"
+    json-server: "npm:^0.17.4"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    react-router-dom: "npm:^6.25.1"
+    typescript: "npm:^5.2.2"
+    vite: "npm:^5.2.0"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -1736,30 +1792,6 @@ __metadata:
   checksum: 10c0/80c089d6f7e0c5b2bd83cf0539ab41474198579584fa10d86d0cafe0642202343cbc119e076a0b1aece191989477081415d66c9fefbf3c957fc2fc4b7009f248
   languageName: node
   linkType: hard
-
-"cycloid@workspace:project/cycloid":
-  version: 0.0.0-use.local
-  resolution: "cycloid@workspace:project/cycloid"
-  dependencies:
-    "@fluid/core": "workspace:^"
-    "@fluid/minimal": "workspace:^"
-    "@types/react": "npm:^18.2.66"
-    "@types/react-dom": "npm:^18.2.22"
-    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
-    "@typescript-eslint/parser": "npm:^7.2.0"
-    "@via/core": "workspace:^"
-    "@via/react": "workspace:^"
-    "@vitejs/plugin-react": "npm:^4.2.1"
-    eslint: "npm:^8.57.0"
-    eslint-plugin-react-hooks: "npm:^4.6.0"
-    eslint-plugin-react-refresh: "npm:^0.4.6"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    typescript: "npm:^5.2.2"
-    vite: "npm:^5.2.0"
-    zod: "npm:^3.23.8"
-  languageName: unknown
-  linkType: soft
 
 "date-fns@npm:^2.30.0":
   version: 2.30.0
@@ -3827,6 +3859,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-router-dom@npm:^6.25.1":
+  version: 6.25.1
+  resolution: "react-router-dom@npm:6.25.1"
+  dependencies:
+    "@remix-run/router": "npm:1.18.0"
+    react-router: "npm:6.25.1"
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 10c0/15e2b5bf89a26db9a108d19a4e0e2054180bfb1f5f62662dd93ad697ee1bdc91a8041efd762d552c95e65fc06ca0cb0c1e88acdeeaf03aba37f7a29e470c7cc4
+  languageName: node
+  linkType: hard
+
 "react-router@npm:6.22.3":
   version: 6.22.3
   resolution: "react-router@npm:6.22.3"
@@ -3846,6 +3891,17 @@ __metadata:
   peerDependencies:
     react: ">=16.8"
   checksum: 10c0/091949805745136350ab049b2a96281bf38742c9d3651019fb48ea79c5eafbfb0379f1d3e636602dd56b0ef278389e8fd25be983dc2c0ffd1103d06dfa8019f3
+  languageName: node
+  linkType: hard
+
+"react-router@npm:6.25.1":
+  version: 6.25.1
+  resolution: "react-router@npm:6.25.1"
+  dependencies:
+    "@remix-run/router": "npm:1.18.0"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 10c0/a7e824c1f6d9641beabc23111865ddd2525b3794403e07b297fc2bdd4cddec93e166aacdb9d2602768864d70f3bf490f59eeab8474a04ae1f13a832f305eeec3
   languageName: node
   linkType: hard
 

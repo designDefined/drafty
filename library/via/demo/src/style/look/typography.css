@@ -1,0 +1,16 @@
+body {
+  font-family: "SUIT Variable", sans-serif;
+}
+
+* {
+}
+
+.logoType {
+  font-family: "Chillax", sans-serif;
+  font-weight: 200;
+  letter-spacing: 36px;
+}
+
+h1 {
+  font-size: 240px;
+}

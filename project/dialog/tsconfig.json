@@ -2,8 +2,8 @@
   "extends": "../../config/ts/vite-react/tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@/*": ["src/*"]
+      "@core/*": ["project/dialog/src/core/*"],
+      "@/*": ["project/dialog/src/*"]
     }
   },
   "include": ["src"],
