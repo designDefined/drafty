@@ -1,5 +1,5 @@
-import { ID } from "../../constant/common/id";
-import { CYCLE_NAME } from "../../constant/cycle/cycleName";
+import { ID } from "@/core/constant/common/id";
+import { CYCLE_NAME } from "@/core/constant/cycle/cycleName";
 import { Objective } from "../objective/Objective";
 import { User } from "../user/User";
 import { Interval } from "./Interval";

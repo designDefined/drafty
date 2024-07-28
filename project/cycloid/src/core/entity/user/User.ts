@@ -1,5 +1,5 @@
-import { ID } from "../../constant/common/id";
-import { USER_NAME } from "../../constant/user/userName";
+import { ID } from "@/core/constant/common/id";
+import { USER_NAME } from "@/core/constant/user/userName";
 
 export type User = {
   id: ID;

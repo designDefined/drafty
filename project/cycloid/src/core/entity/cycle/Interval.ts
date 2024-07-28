@@ -1,4 +1,4 @@
-import { INTERVAL_TYPE } from "../../constant/cycle/intervalType";
+import { INTERVAL_TYPE } from "@/core/constant/cycle/intervalType";
 
 export type DailyInterval = {
   type: INTERVAL_TYPE["DAILY"];
