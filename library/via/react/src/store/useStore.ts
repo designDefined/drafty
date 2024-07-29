@@ -6,13 +6,7 @@ import {
   StoredValues,
 } from "@via/core";
 import { nanoid } from "nanoid";
-import {
-  ReducerWithoutAction,
-  useCallback,
-  useContext,
-  useEffect,
-  useReducer,
-} from "react";
+import { useCallback, useContext, useEffect, useReducer, useRef } from "react";
 import { ViaContext } from "./storeContext";
 
 type StoredState<T> = [StoredValues<T>, StoredStatus<T>];
@@ -20,22 +14,25 @@ type StoredSet<T> = (
   setter: Setter<T> | Promise<Setter<T>>,
   config?: SetterConfig,
 ) => void;
+type Subscribe = () => void;
 type UseStoreParams<T> = StoredStatus<T> & { value?: T };
 
 export const useStore = <T>({
   key,
   ...params
-}: UseStoreParams<T>): [StoredState<T>, StoredSet<T>, Store] => {
+}: UseStoreParams<T>): [StoredState<T>, StoredSet<T>, Subscribe, Store] => {
   const store = useContext(ViaContext);
   if (!store) throw new Error("useStore must be used within proper context");
+  const subscriptionKey = useRef(nanoid());
 
   const [state, dispatch] = useReducer<
-    ReducerWithoutAction<StoredState<T>>,
+    (prev: StoredState<T>, next: StoredState<T>) => StoredState<T>,
     null
   >(
-    (prev: StoredState<T>) => {
-      const { values, status } = store.get<T>({ key, ...params });
-      return Object.is(values, prev[0]) && Object.is(status, prev[1]) // TODO: Add slice for rerender optimization
+    (prev, next) => {
+      const [prevValues, prevStatus] = prev;
+      const [values, status] = next;
+      return Object.is(values, prevValues) && Object.is(status, prevStatus) // TODO: Add slice for rerender optimization
         ? prev
         : [values, status];
     },
@@ -51,15 +48,26 @@ export const useStore = <T>({
     [store, key],
   );
 
-  useEffect(
-    () =>
-      store.subscribe<T>({
-        key,
-        subscriptionKey: nanoid(),
-        subscriber: dispatch,
-      }),
-    [store, key],
-  );
+  const subscribe = useCallback(() => {
+    store.subscribe<T>({
+      key,
+      subscriptionKey: subscriptionKey.current,
+      subscriber: {
+        fn: dispatch,
+        isTemporary: true,
+      },
+    });
+  }, [key, store]);
 
-  return [state, set, store];
+  useEffect(() => {
+    return store.subscribe<T>({
+      key,
+      subscriptionKey: nanoid(),
+      subscriber: {
+        fn: dispatch,
+      },
+    });
+  }, [store, key]);
+
+  return [state, set, subscribe, store];
 };

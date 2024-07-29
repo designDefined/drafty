@@ -27,7 +27,10 @@ export type StoredStatus<T> = {
   staleTime?: number;
   gcTime?: number;
 };
-export type Subscriber<T> = (next: [StoredValues<T>, StoredStatus<T>]) => void;
+export type Subscriber<T> = {
+  fn: (next: [StoredValues<T>, StoredStatus<T>]) => void;
+  isTemporary?: boolean;
+};
 
 // Config
 export type StoreConfig = {};
@@ -73,6 +76,7 @@ export type SubscribeParams<T> = {
   key: Key;
   subscriptionKey: Key;
   subscriber: Subscriber<T>;
+  isTemporary?: boolean;
 };
 
 export const createStore = () => {
@@ -104,6 +108,7 @@ export const createStore = () => {
     let newValues: StoredValues<T>;
 
     try {
+      if (config?.error) throw config.error;
       if (config?.override && typeof setter !== "function")
         newValues = { ...values, value: setter as T };
       else if (!values.value) return;
@@ -125,35 +130,39 @@ export const createStore = () => {
     if (config?.error) newValues.error = config.error;
     stored.values = newValues;
     stored.updatedAt = Date.now();
-    stored.subscribers.forEach((cb) => cb([newValues, status]));
+    stored.subscribers.forEach((cb) => {
+      cb.fn([newValues, status]);
+    });
   };
 
   const _updateAsync = <T>({ key, promise, config }: _UpdateAsyncParams<T>) => {
     const stored = _read<T>({ key });
     if (!stored) return;
 
-    stored.values.promise = promise
-      .then((setter) =>
-        _update({ key, setter, config: { ...config, clearPromise: true } }),
-      )
-      .catch((e) =>
+    promise
+      .then((setter) => {
+        _update({ key, setter, config: { ...config, clearPromise: true } });
+      })
+      .catch((e) => {
         _update({
           key,
           setter: () => {},
           config: { ...config, clearPromise: true, error: e },
-        }),
-      );
+        });
+      });
 
     const newValues = { ...stored.values, promise, config };
     stored.values = newValues;
-    stored.subscribers.forEach((cb) => cb([newValues, stored.status]));
+    stored.subscribers.forEach((cb) => {
+      cb.fn([newValues, stored.status]);
+    });
   };
 
   const _refresh = <T>({ key, from: fromOverride }: _RefreshParams<T>) => {
     const stored = _read<T>({ key });
     if (!stored) return;
-
     if (stored.values.promise) return;
+
     const from = fromOverride ?? stored.status.from;
     if (!from) throw new Error("No fetcher found");
 
@@ -161,16 +170,21 @@ export const createStore = () => {
     if (isPromise(setter)) {
       _updateAsync({ key: key, promise: setter, config: { override: true } });
     } else {
-      _update({ key, setter: setter, config: { override: true } });
+      _update({ key, setter, config: { override: true } });
     }
   };
 
   const _check = <T>({ stored }: _CheckParams<T>) => {
     if (
-      (!stored.values.value && !stored.values.promise) ||
+      // refresh if values are totally empty
+      (stored.values.value === undefined &&
+        stored.values.promise === undefined &&
+        stored.values.error === undefined) ||
+      // or stored is stale
       stored.updatedAt + (stored.status.staleTime ?? Infinity) < Date.now()
-    )
+    ) {
       _refresh<T>({ key: stored.status.key });
+    }
   };
 
   // public
