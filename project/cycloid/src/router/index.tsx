@@ -4,6 +4,7 @@ import New from "@/ui/new/New";
 import RootLayout from "@/ui/layout/RootLayout";
 import PublicLayout from "@/ui/layout/PublicLayout";
 import Login from "@/ui/login/Login";
+import Register from "@/ui/register/Register";
 import RootError from "@/ui/error/RootError";
 
 export const router = createBrowserRouter([
@@ -19,7 +20,13 @@ export const router = createBrowserRouter([
   {
     path: "",
     element: <PublicLayout />,
-    children: [{ path: "login", element: <Login /> }],
+    children: [
+      { path: "login", element: <Login /> },
+      {
+        path: "register",
+        element: <Register />,
+      },
+    ],
   },
 ]);
 

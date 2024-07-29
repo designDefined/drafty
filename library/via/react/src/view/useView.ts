@@ -19,7 +19,7 @@ export const useView = <T>({
   if (!view.value) {
     /**
      * Manually subscribe to store
-     * because throwing prevents `useEffect` inside `useStore` from running.
+     * because throwing promise or error prevents `useEffect` inside `useStore` from running.
      */
     subscribe();
     if (view.promise) throw view.promise;

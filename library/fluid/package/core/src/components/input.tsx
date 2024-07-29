@@ -6,7 +6,7 @@ export type InputComponentProps = FluidComponentProps<
   DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
 >;
 
-export default function Input({
+export function Input({
   // style
   style,
   flex,

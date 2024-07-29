@@ -4,5 +4,8 @@ import { fetchLocal } from "@/util/local-server/fetch";
 
 export const MeView = View<UserDetail>(() => ({
   key: ["view", "user", "me"],
-  from: () => fetchLocal.get<UserDetail>("user/me", { debug: { delay: 2000 } }),
+  from: async () => {
+    const [{ id }] = await fetchLocal.get<{ id: number }[]>("/users/me");
+    return await fetchLocal.get<UserDetail>("/users", { id });
+  },
 }));

@@ -107,24 +107,19 @@ export const createStore = () => {
     const { values, status } = stored;
     let newValues: StoredValues<T>;
 
-    try {
-      if (config?.error) throw config.error;
-      if (config?.override && typeof setter !== "function")
-        newValues = { ...values, value: setter as T };
-      else if (!values.value) return;
-      else if (typeof setter === "function")
-        newValues = {
-          ...values,
-          value: produce(values.value, setter as (draft: T) => void),
-        };
-      else
-        newValues = {
-          ...values,
-          value: merge(cloneDeep(values.value), setter),
-        };
-    } catch (e) {
-      newValues = { ...values, error: e };
-    }
+    if (config?.override && typeof setter !== "function")
+      newValues = { ...values, value: setter as T };
+    else if (!values.value) return;
+    else if (typeof setter === "function")
+      newValues = {
+        ...values,
+        value: produce(values.value, setter as (draft: T) => void),
+      };
+    else
+      newValues = {
+        ...values,
+        value: merge(cloneDeep(values.value), setter),
+      };
 
     if (config?.clearPromise) newValues.promise = undefined;
     if (config?.error) newValues.error = config.error;

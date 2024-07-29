@@ -1,27 +1,45 @@
-@font-face {
-  font-family: "SUIT-Regular";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2")
-    format("woff2");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "SUITE-Regular";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/SUITE-Regular.woff2")
-    format("woff2");
-  font-weight: 400;
-  font-style: normal;
-}
-
+/* root */
 :root {
-  font-family: "SUIT-Regular", sans-serif;
+  font-family: "SUIT Variable", sans-serif;
   font-size: 18px;
+  font-weight: 200;
   line-height: 1.25;
 }
 
+/* reset */
 button,
 input,
 textarea {
   font: inherit;
+}
+
+/* tags */
+h1 {
+  font-weight: 600;
+  font-size: 48px;
+}
+h2 {
+  font-weight: 500;
+  font-size: 40px;
+}
+h3 {
+  font-weight: 400;
+  font-size: 32px;
+}
+h4 {
+  font-weight: 400;
+  font-size: 28px;
+}
+h5 {
+  font-weight: 300;
+  font-size: 24px;
+}
+h6 {
+  font-weight: 300;
+  font-size: 20px;
+}
+
+/* custom */
+.thin {
+  font-weight: 100;
 }

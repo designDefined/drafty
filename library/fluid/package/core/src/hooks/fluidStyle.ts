@@ -70,7 +70,7 @@ export type FluidStyle = {
  * default
  */
 const defaultFluidStyle: Required<FluidStyle> = {
-  flex: [1, 1, "auto"],
+  flex: [0, 0, "auto"],
   flow: ["column", "nowrap"],
   align: [undefined],
   justify: [undefined],

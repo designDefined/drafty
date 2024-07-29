@@ -13,10 +13,10 @@ export const useIntent = <I, O>({
   ...overrideStatus
 }: UseIntentParams<I, O>) => {
   const storeStatusRef = useRef({ ...intentStatus, ...overrideStatus });
-  const toRef = useRef(to ?? overrideTo);
+  const toRef = useRef(overrideTo ?? to);
   const modelRef = useRef(model?.input);
-  const nextRef = useRef(next ?? overrideNext);
-  const [[intent, status], set, store] = useStore<StoredIntent<I, O>>({
+  const nextRef = useRef(overrideNext ?? next);
+  const [[intent, status], set, , store] = useStore<StoredIntent<I, O>>({
     ...storeStatusRef.current,
     model: undefined,
     from: undefined,
@@ -35,49 +35,30 @@ export const useIntent = <I, O>({
     (input: I) => {
       try {
         if (!toRef.current) throw new Error("no to provided");
-        if (intent.value?.isWorking) return Promise.reject();
-
+        if (intent.value?.isWorking)
+          return Promise.reject(new Error("already working"));
         const parsedInput = modelRef.current?.(input) ?? input;
         const toResult = toRef.current(parsedInput);
+
         if (isPromise(toResult)) {
-          set((prev) => {
-            prev.isWorking = true;
-            prev.input = input;
-          });
+          set({ isWorking: true, input });
           return toResult
             .then((o) => {
-              set((prev) => {
-                prev.isWorking = false;
-                prev.output = o;
-              });
+              set({ isWorking: false, output: o });
               resolve({ i: input, o });
               return o;
             })
             .catch((e) => {
-              set(
-                (prev) => {
-                  prev.isWorking = false;
-                },
-                { error: e },
-              );
+              set({ isWorking: false }, { error: e });
               return Promise.reject(e);
             });
         } else {
-          set((prev) => {
-            prev.input = input;
-            prev.output = toResult;
-          });
+          set({ isWorking: false, input, output: toResult });
           resolve({ i: input, o: toResult });
           return Promise.resolve(toResult);
         }
       } catch (e) {
-        set(
-          (prev) => {
-            prev.input = input;
-            prev.isWorking = false;
-          },
-          { error: e },
-        );
+        set({ input, isWorking: false }, { error: e });
         return Promise.reject(e);
       }
     },

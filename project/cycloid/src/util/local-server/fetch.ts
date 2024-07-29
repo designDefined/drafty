@@ -8,8 +8,7 @@ type GetConfig<T> = {
   debug?: DebugConfig;
 };
 
-type PostConfig<Response> = {
-  parser?: (data: unknown) => Response;
+type PostConfig = {
   debug?: DebugConfig;
 };
 
@@ -21,9 +20,10 @@ const get = async <T>(key: string, config?: GetConfig<T>): Promise<T> => {
     const json = JSON.parse(data);
 
     // find by id
-    const identified = config?.id
-      ? json.find((datum: { id: number }) => datum?.id === config.id)
-      : data;
+    const identified =
+      config?.id !== undefined
+        ? json.find((datum: { id: number }) => datum?.id === config.id)
+        : json;
     if (identified === undefined) throw new Error("Data of id not found");
 
     // parse
@@ -40,26 +40,23 @@ const get = async <T>(key: string, config?: GetConfig<T>): Promise<T> => {
   }
 };
 
-const post = async <Body, Response extends { id: number }>(
+const post = async <T extends { id: number }>(
   key: string,
-  body: Body,
-  config?: PostConfig<Response>,
-) => {
+  body: Omit<T, "id">,
+  config?: PostConfig,
+): Promise<Omit<T, "id"> & { id: number }> => {
   try {
     const existing = await localStorage.getItem(KEY_PREFIX + key);
     if (!existing) {
       const datum = { id: 0, ...body };
 
       // parse and set
-      const parsed = (
-        config?.parser ? config.parser(datum) : datum
-      ) as Response;
-      localStorage.setItem(KEY_PREFIX + key, JSON.stringify([parsed]));
+      localStorage.setItem(KEY_PREFIX + key, JSON.stringify([datum]));
 
       // debug
       const promise = config?.debug
-        ? debugResponse(parsed, config.debug)
-        : Promise.resolve(parsed);
+        ? debugResponse(datum, config.debug)
+        : Promise.resolve(datum);
 
       return promise;
     }
@@ -70,7 +67,7 @@ const post = async <Body, Response extends { id: number }>(
     const datum = { id, ...body };
 
     // parse and set
-    const parsed = (config?.parser ? config.parser(datum) : datum) as Response;
+    const parsed = datum;
     json.push(parsed);
     localStorage.setItem(KEY_PREFIX + key, JSON.stringify(json));
 

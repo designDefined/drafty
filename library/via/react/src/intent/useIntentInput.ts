@@ -17,13 +17,13 @@ export const useIntentInput = <I, O>({
   intent: { key, model, from },
   from: fromOverride,
 }: UseIntentInputParams<I, O>) => {
+  const fromRef = useRef(fromOverride ?? from);
   const modelTreeRef = useRef(model?.tree);
-  const [[state], setInternal, store] = useStore<InputTree<I>>({
+  const [[state], setInternal, , store] = useStore<InputTree<I>>({
     key: "input_" + key,
     from: () => {
-      const fromAssured = from ?? fromOverride;
-      if (!fromAssured) throw new Error("no from provided");
-      return parseInitialTree(fromAssured(), modelTreeRef.current);
+      if (!fromRef.current) throw new Error("no from provided");
+      return parseInitialTree(fromRef.current(), modelTreeRef.current);
     },
   });
 
@@ -38,5 +38,10 @@ export const useIntentInput = <I, O>({
     [setInternal],
   );
 
-  return { values: state.value!, set, store };
+  const reset = useCallback(() => {
+    if (!fromRef.current) throw new Error("no from provided");
+    setInternal(parseInitialTree(fromRef.current(), modelTreeRef.current));
+  }, [setInternal]);
+
+  return { values: state.value!, set, reset, store };
 };

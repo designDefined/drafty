@@ -14,7 +14,7 @@ export const useIntentSubmit = <I, O>({
   ...params
 }: UseIntentSubmitParams<I, O>) => {
   const { send, isWorking } = useIntent<I, O>({ intent, ...params });
-  const { values } = useIntentInput<I, O>({ intent, from });
+  const { values, set, reset } = useIntentInput<I, O>({ intent, from });
 
   const { inputValues, error } = useMemo(() => {
     try {
@@ -27,8 +27,19 @@ export const useIntentSubmit = <I, O>({
 
   const submit = useCallback(() => {
     if (error) return Promise.reject(error);
-    return send(inputValues as I);
-  }, [inputValues, error, send]);
+    return send(inputValues as I).then((response) => {
+      reset();
+      return response;
+    });
+  }, [inputValues, error, reset, send]);
 
-  return { submit, values, inputValues, error, isWorking, isValid: !error };
+  return {
+    submit,
+    values,
+    set,
+    inputValues,
+    error,
+    isWorking,
+    isValid: !error,
+  };
 };
