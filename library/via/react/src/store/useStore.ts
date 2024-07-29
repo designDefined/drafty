@@ -52,10 +52,7 @@ export const useStore = <T>({
     store.subscribe<T>({
       key,
       subscriptionKey: subscriptionKey.current,
-      subscriber: {
-        fn: dispatch,
-        isTemporary: true,
-      },
+      subscriber: { fn: dispatch, isTemporary: true },
     });
   }, [key, store]);
 

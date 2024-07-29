@@ -21,6 +21,7 @@ export const useView = <T>({
      * Manually subscribe to store
      * because throwing promise or error prevents `useEffect` inside `useStore` from running.
      */
+
     subscribe();
     if (view.promise) throw view.promise;
     throw view.error ?? new Error("unknown error from useView"); // TODO: Handle error

@@ -109,8 +109,9 @@ export const createStore = () => {
 
     if (config?.override && typeof setter !== "function")
       newValues = { ...values, value: setter as T };
-    else if (!values.value) return;
-    else if (typeof setter === "function")
+    else if (!values.value) {
+      newValues = {};
+    } else if (typeof setter === "function")
       newValues = {
         ...values,
         value: produce(values.value, setter as (draft: T) => void),
