@@ -1,6 +1,12 @@
 import { Model } from "../store";
 import { DeepPartial } from "../util/deep";
 
+// Config
+export type InputConfig = {
+  useInitialValue?: boolean;
+  deepCompareDiff?: boolean;
+};
+
 // Model Types
 export type ModelTree<T> = T extends object
   ? T extends any[]
