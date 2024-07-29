@@ -1,6 +1,6 @@
 import { Main, Div, H1, H2 } from "@fluid/core";
 
-export default function HomePage() {
+export default function Home() {
   return (
     <Main>
       <H2>가나다</H2>

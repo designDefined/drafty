@@ -1,4 +1,6 @@
-import { DebugConfig, debugResponse } from "./debug";
+import { DebugConfig, debugError, debugResponse } from "./debug";
+
+const KEY_PREFIX = "CYCLOID_LOCAL_SERVER_";
 
 type GetConfig<T> = {
   id?: number;
@@ -11,10 +13,10 @@ type PostConfig<Response> = {
   debug?: DebugConfig;
 };
 
-const get = async <T>(key: string, config?: GetConfig<T>) => {
+const get = async <T>(key: string, config?: GetConfig<T>): Promise<T> => {
   try {
     // get data
-    const data = await localStorage.getItem(key);
+    const data = await localStorage.getItem(KEY_PREFIX + key);
     if (data === null) throw new Error("Data not found");
     const json = JSON.parse(data);
 
@@ -34,7 +36,7 @@ const get = async <T>(key: string, config?: GetConfig<T>) => {
 
     return promise;
   } catch (e) {
-    return Promise.reject(e);
+    return config?.debug ? debugError(e, config.debug) : Promise.reject(e);
   }
 };
 
@@ -44,7 +46,7 @@ const post = async <Body, Response extends { id: number }>(
   config?: PostConfig<Response>,
 ) => {
   try {
-    const existing = await localStorage.getItem(key);
+    const existing = await localStorage.getItem(KEY_PREFIX + key);
     if (!existing) {
       const datum = { id: 0, ...body };
 
@@ -52,7 +54,7 @@ const post = async <Body, Response extends { id: number }>(
       const parsed = (
         config?.parser ? config.parser(datum) : datum
       ) as Response;
-      localStorage.setItem(key, JSON.stringify([parsed]));
+      localStorage.setItem(KEY_PREFIX + key, JSON.stringify([parsed]));
 
       // debug
       const promise = config?.debug
@@ -70,7 +72,7 @@ const post = async <Body, Response extends { id: number }>(
     // parse and set
     const parsed = (config?.parser ? config.parser(datum) : datum) as Response;
     json.push(parsed);
-    localStorage.setItem(key, JSON.stringify(json));
+    localStorage.setItem(KEY_PREFIX + key, JSON.stringify(json));
 
     // debug
     const promise = config?.debug
@@ -79,11 +81,11 @@ const post = async <Body, Response extends { id: number }>(
 
     return promise;
   } catch (e) {
-    return Promise.reject(e);
+    return config?.debug ? debugError(e, config.debug) : Promise.reject(e);
   }
 };
 
-export const fetch = {
+export const fetchLocal = {
   get,
   post,
 };
