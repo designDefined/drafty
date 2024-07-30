@@ -44,7 +44,11 @@ export type Stored<T> = {
   gcTimer: number | null;
 };
 
-type _CreateParams<T> = StoredStatus<T> & { value?: T };
+type _CreateParams<T> = StoredStatus<T> & {
+  value?: T;
+  promise?: Promise<Setter<T> | void>;
+  error?: unknown;
+};
 type _ReadParams = {
   key: Key;
 };
@@ -83,9 +87,9 @@ export const createStore = () => {
   const store = new Map<Key, Stored<any>>();
 
   // private
-  const _create = <T>({ key, value, ...rest }: _CreateParams<T>) => {
+  const _create = <T>({ key, value, promise, error, ...rest }: _CreateParams<T>) => {
     const created: Stored<T> = {
-      values: { value },
+      values: { value, promise, error },
       status: { key, ...rest },
       subscribers: new Map<Key, Subscriber<T>>(),
       updatedAt: 0,
@@ -101,26 +105,27 @@ export const createStore = () => {
   };
 
   const _update = <T>({ key, setter, config }: _UpdateParams<T>) => {
-    const stored = _read<T>({ key });
-    if (!stored) return;
+    // check if request is valid
+    if (config?.override && typeof setter === "function") throw new Error("Cannot override with function setter");
 
+    const stored = _read<T>({ key });
+
+    // add stored if it doesn't exist and request is overridable
+    if (!stored) {
+      if (!config?.override) return;
+      _create({ key, value: setter, ...config });
+      return;
+    }
+
+    // update stored
     const { values, status } = stored;
     let newValues: StoredValues<T>;
 
-    if (config?.override && typeof setter !== "function")
-      newValues = { ...values, value: setter as T };
-    else if (!values.value) {
-      newValues = {};
-    } else if (typeof setter === "function")
-      newValues = {
-        ...values,
-        value: produce(values.value, setter as (draft: T) => void),
-      };
-    else
-      newValues = {
-        ...values,
-        value: merge(cloneDeep(values.value), setter),
-      };
+    if (config?.override) newValues = { ...values, value: setter as T };
+    else if (!values.value) newValues = {};
+    else if (typeof setter === "function")
+      newValues = { ...values, value: produce(values.value, setter as (draft: T) => void) };
+    else newValues = { ...values, value: merge(cloneDeep(values.value), setter) };
 
     if (config?.clearPromise) newValues.promise = undefined;
     if (config?.error) newValues.error = config.error;
@@ -173,9 +178,7 @@ export const createStore = () => {
   const _check = <T>({ stored }: _CheckParams<T>) => {
     if (
       // refresh if values are totally empty
-      (stored.values.value === undefined &&
-        stored.values.promise === undefined &&
-        stored.values.error === undefined) ||
+      (stored.values.value === undefined && stored.values.promise === undefined && stored.values.error === undefined) ||
       // or stored is stale
       stored.updatedAt + (stored.status.staleTime ?? Infinity) < Date.now()
     ) {
@@ -199,11 +202,7 @@ export const createStore = () => {
     else _update({ key, setter, config });
   };
 
-  const subscribe = <T>({
-    key,
-    subscriptionKey,
-    subscriber,
-  }: SubscribeParams<T>) => {
+  const subscribe = <T>({ key, subscriptionKey, subscriber }: SubscribeParams<T>) => {
     const stored = get<T>({ key });
     if (!stored) throw new Error("No stored found"); // TODO: Error handling
     stored.subscribers.set(subscriptionKey, subscriber);
