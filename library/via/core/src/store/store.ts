@@ -80,13 +80,12 @@ export type SubscribeParams<T> = {
   key: Key;
   subscriptionKey: Key;
   subscriber: Subscriber<T>;
-  isTemporary?: boolean;
-};
+} & Omit<GetParams<T>, "key">;
 
 export const createStore = () => {
   const store = new Map<Key, Stored<any>>();
 
-  // private
+  // private method starts with underscore
   const _create = <T>({ key, value, promise, error, ...rest }: _CreateParams<T>) => {
     const created: Stored<T> = {
       values: { value, promise, error },
@@ -108,6 +107,7 @@ export const createStore = () => {
     // check if request is valid
     if (config?.override && typeof setter === "function") throw new Error("Cannot override with function setter");
 
+    // read stored
     const stored = _read<T>({ key });
 
     // add stored if it doesn't exist and request is overridable
@@ -121,10 +121,15 @@ export const createStore = () => {
     const { values, status } = stored;
     let newValues: StoredValues<T>;
 
+    // replace existing value with setter if override
     if (config?.override) newValues = { ...values, value: setter as T };
-    else if (!values.value) newValues = {};
+    // prevent partial merge if value is empty
+    else if (!values.value) newValues = values; // TODO: Is this okay?
+    // merge with immer
     else if (typeof setter === "function")
       newValues = { ...values, value: produce(values.value, setter as (draft: T) => void) };
+    // deep merge with lodash
+    // use cloneDeep for immutability
     else newValues = { ...values, value: merge(cloneDeep(values.value), setter) };
 
     if (config?.clearPromise) newValues.promise = undefined;
@@ -203,11 +208,16 @@ export const createStore = () => {
   };
 
   const subscribe = <T>({ key, subscriptionKey, subscriber }: SubscribeParams<T>) => {
-    const stored = get<T>({ key });
+    const stored = _read<T>({ key });
     if (!stored) throw new Error("No stored found"); // TODO: Error handling
-    stored.subscribers.set(subscriptionKey, subscriber);
 
+    // temporary subscription can't override existing one
+    if (subscriber.isTemporary && stored.subscribers.has(subscriptionKey)) return () => {};
+
+    // add subscription
+    stored.subscribers.set(subscriptionKey, subscriber);
     return () => {
+      subscriber.fn([{ value: undefined, promise: new Promise(() => {}), error: undefined }, stored.status]);
       stored.subscribers.delete(subscriptionKey);
       // TODO: Add cache logic
     };

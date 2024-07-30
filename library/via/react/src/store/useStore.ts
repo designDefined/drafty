@@ -14,6 +14,8 @@ export const useStore = <T>({
 }: UseStoreParams<T>): [StoredState<T>, StoredSet<T>, Subscribe, Store] => {
   const store = useContext(ViaContext);
   if (!store) throw new Error("useStore must be used within proper context");
+
+  // subscriptionKey remains same throughout the lifecycle of the component
   const subscriptionKey = useRef(nanoid());
 
   const [state, dispatch] = useReducer<(prev: StoredState<T>, next: StoredState<T>) => StoredState<T>, null>(
@@ -26,14 +28,14 @@ export const useStore = <T>({
     },
     null,
     () => {
-      const { values, status } = store.get<T>({ key, ...params });
+      const { values, status } = store.get<T>({ ...params, key });
       return [values, status];
     },
   );
 
   const set: StoredSet<T> = useCallback((setter, config) => store.set<T>({ key, setter, config }), [store, key]);
 
-  const subscribe = useCallback(() => {
+  const temporalSubscribe = useCallback(() => {
     store.subscribe<T>({
       key,
       subscriptionKey: subscriptionKey.current,
@@ -43,13 +45,18 @@ export const useStore = <T>({
 
   useEffect(() => {
     return store.subscribe<T>({
+      ...params,
+      subscriptionKey: subscriptionKey.current,
+      subscriber: { fn: dispatch },
       key,
-      subscriptionKey: nanoid(),
-      subscriber: {
-        fn: dispatch,
-      },
     });
-  }, [store, key]);
+  }, [key]); // subscription depends nothing but the key
 
-  return [state, set, subscribe, store];
+  // if key is changed, re-initiate the store
+  if (key !== state[1].key) {
+    const { values, status } = store.get<T>({ ...params, key });
+    return [[values, status], set, temporalSubscribe, store];
+  }
+
+  return [state, set, temporalSubscribe, store];
 };

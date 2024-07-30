@@ -1,5 +1,14 @@
-import { DeepPartial, hashKeys, InputTree, ModelTree, parseInitialTree, parseInputTree, RawKey } from "@via/core";
-import { useCallback, useRef } from "react";
+import {
+  DeepPartial,
+  getValidInputFromInputTree,
+  hashKeys,
+  InputTree,
+  ModelTree,
+  parseInitialTree,
+  parseInputTree,
+  RawKey,
+} from "@via/core";
+import { useCallback, useMemo, useRef } from "react";
 import { useStore } from "../store";
 
 type UseSimpleInputParams<T> = {
@@ -9,13 +18,23 @@ type UseSimpleInputParams<T> = {
 };
 
 export const useSimpleInput = <T>({ key, model, from }: UseSimpleInputParams<T>) => {
-  const hashedKey = useRef(hashKeys(key));
+  const hashedKey = useMemo(() => hashKeys(key), [key]);
   const fromRef = useRef(from);
   const modelTreeRef = useRef(model);
   const [[state], setInternal, , store] = useStore<InputTree<T>>({
-    key: "input_" + hashedKey.current,
+    key: "input_" + hashedKey,
     from: () => parseInitialTree(fromRef.current(), modelTreeRef.current),
   });
+
+  const { inputValues, error } = useMemo(() => {
+    if (!state.value) return { inputValues: undefined, error: undefined };
+    try {
+      const inputValues = getValidInputFromInputTree(state.value);
+      return { inputValues, error: undefined };
+    } catch (e) {
+      return { inputValues: undefined, error: e };
+    }
+  }, [state.value]);
 
   const set = useCallback(
     (setter: DeepPartial<T> | ((prev: InputTree<T>) => void)) => {
@@ -29,5 +48,5 @@ export const useSimpleInput = <T>({ key, model, from }: UseSimpleInputParams<T>)
     setInternal(parseInitialTree(fromRef.current(), modelTreeRef.current));
   }, [setInternal]);
 
-  return { values: state.value!, set, reset, store };
+  return { values: state.value!, inputValues, error, set, reset, store };
 };
