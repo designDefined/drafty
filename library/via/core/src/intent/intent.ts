@@ -4,7 +4,7 @@ import { hashKeys, RawKey } from "../util/hashKey";
 import { ModelTree } from "./input";
 
 export type IOModel<I, O> = {
-  tree?: ModelTree<I>;
+  items?: ModelTree<I>;
   input?: Model<I>;
   output?: Model<O>;
 };
@@ -15,6 +15,7 @@ export type IntentParams<I, O> = {
   to?: To<I, O>;
   from?: () => I;
   next?: (result: { i: I; o: O }) => Next[];
+  catch?: (result: { i: I; error: unknown }) => Next[];
   model?: IOModel<I, O>;
 };
 

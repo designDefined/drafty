@@ -10,7 +10,7 @@ export type RegisterInput = z.infer<typeof RegisterInput>;
 
 export const RegisterIntent = Intent<RegisterInput, UserDetail>(() => ({
   key: ["intent", "user", "register"],
-  model: { tree: zodUtil.deepParse(RegisterInput) },
+  model: { items: zodUtil.deepParse(RegisterInput) },
   from: () => ({ name: "" }),
   to: (input) => {
     const body = { ...input, createdAt: "2024-07-29" };

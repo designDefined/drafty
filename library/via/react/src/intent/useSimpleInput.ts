@@ -2,7 +2,7 @@ import {
   DeepPartial,
   hashKeys,
   InputTree,
-  IOModel,
+  ModelTree,
   parseInitialTree,
   parseInputTree,
   RawKey,
@@ -12,7 +12,7 @@ import { useStore } from "../store";
 
 type UseSimpleInputParams<T> = {
   key: RawKey[];
-  model?: Omit<IOModel<T, unknown>, "output">;
+  model?: ModelTree<T>;
   from: () => T;
 };
 
@@ -23,7 +23,7 @@ export const useSimpleInput = <T>({
 }: UseSimpleInputParams<T>) => {
   const hashedKey = useRef(hashKeys(key));
   const fromRef = useRef(from);
-  const modelTreeRef = useRef(model?.tree);
+  const modelTreeRef = useRef(model);
   const [[state], setInternal, , store] = useStore<InputTree<T>>({
     key: "input_" + hashedKey.current,
     from: () => parseInitialTree(fromRef.current(), modelTreeRef.current),
