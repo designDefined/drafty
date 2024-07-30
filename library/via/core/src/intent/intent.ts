@@ -26,15 +26,11 @@ export type StoredIntent<I, O> = {
 };
 
 export const Intent =
-  <I, O, Deps extends unknown[] = never[]>(
-    params: (...deps: Deps) => IntentParams<I, O>,
-  ) =>
+  <I, O, Deps extends unknown[] = never[]>(params: (...deps: Deps) => IntentParams<I, O>) =>
   (...args: Deps) => {
     const intent = params(...args);
     const key = hashKeys(intent.key);
     return { ...intent, key };
   };
 
-export type Intent<I, O> = ReturnType<
-  ReturnType<typeof Intent<I, O, unknown[]>>
->;
+export type Intent<I, O> = ReturnType<ReturnType<typeof Intent<I, O, unknown[]>>>;

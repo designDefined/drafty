@@ -45,8 +45,7 @@ export const useIntent = <I, O>({
     (input: I) => {
       try {
         if (!toRef.current) throw new Error("no to provided");
-        if (intent.value?.isWorking)
-          return Promise.reject(new Error("already working")); // TODO: Add config to allow simultaneous requests
+        if (intent.value?.isWorking) return Promise.reject(new Error("already working")); // TODO: Add config to allow simultaneous requests
         const parsedInput = modelRef.current?.(input) ?? input;
         const toResult = toRef.current(parsedInput);
 

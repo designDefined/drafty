@@ -4,10 +4,7 @@ import { View, ViewParams } from "@via/core";
 
 type UseViewParams<T> = { view: View<T> } & Omit<ViewParams<T>, "key">;
 
-export const useViewOptional = <T>({
-  view: viewStatus,
-  ...overrideStatus
-}: UseViewParams<T>) => {
+export const useViewOptional = <T>({ view: viewStatus, ...overrideStatus }: UseViewParams<T>) => {
   const storeStatusRef = useRef({ ...viewStatus, ...overrideStatus });
   const [[view, status], set] = useStore<T>(storeStatusRef.current);
 

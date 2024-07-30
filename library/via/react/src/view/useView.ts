@@ -4,17 +4,15 @@ import { View, ViewParams } from "@via/core";
 
 type UseViewParams<T> = { view: View<T> } & Omit<ViewParams<T>, "key">;
 
-export const useView = <T>({
-  view: viewStatus,
-  ...overrideStatus
-}: UseViewParams<T>) => {
+export const useView = <T>({ view: viewStatus, ...overrideStatus }: UseViewParams<T>) => {
   const storeStatusRef = useRef({ ...viewStatus, ...overrideStatus });
   const [[view, status], set, subscribe] = useStore<T>(storeStatusRef.current);
 
   const update = useCallback(() => {
     if (!storeStatusRef.current.updater) throw new Error("no updater provided"); // TODO: Handle error
-    set(storeStatusRef.current.updater);
-  }, [set]);
+    if (!view.value) throw new Error("no value found"); // TODO: Handle error
+    set(storeStatusRef.current.updater(view.value));
+  }, [set, view.value]);
 
   if (!view.value) {
     /**

@@ -11,5 +11,4 @@ export type Falsy = false | null | undefined;
  * @param value Any value that can be optional
  * @returns `true` if the value is `false`, `null`, or `undefined`.
  */
-export const isFalsy = (value: unknown): value is Falsy =>
-  value === false || value === null || value === undefined;
+export const isFalsy = (value: unknown): value is Falsy => value === false || value === null || value === undefined;

@@ -18,11 +18,7 @@ const hashKey = (target: RawKey | Falsy): Key => {
     Object.keys(target)
       .sort()
       .reduce((result, key) => {
-        if (
-          typeof target[key] === "object" &&
-          target[key] !== null &&
-          !Array.isArray(target[key])
-        ) {
+        if (typeof target[key] === "object" && target[key] !== null && !Array.isArray(target[key])) {
           result[key] = hashKey(target[key] as Record<string, unknown>);
           return result;
         }

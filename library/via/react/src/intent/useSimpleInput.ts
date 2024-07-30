@@ -1,12 +1,4 @@
-import {
-  DeepPartial,
-  hashKeys,
-  InputTree,
-  ModelTree,
-  parseInitialTree,
-  parseInputTree,
-  RawKey,
-} from "@via/core";
+import { DeepPartial, hashKeys, InputTree, ModelTree, parseInitialTree, parseInputTree, RawKey } from "@via/core";
 import { useCallback, useRef } from "react";
 import { useStore } from "../store";
 
@@ -16,11 +8,7 @@ type UseSimpleInputParams<T> = {
   from: () => T;
 };
 
-export const useSimpleInput = <T>({
-  key,
-  model,
-  from,
-}: UseSimpleInputParams<T>) => {
+export const useSimpleInput = <T>({ key, model, from }: UseSimpleInputParams<T>) => {
   const hashedKey = useRef(hashKeys(key));
   const fromRef = useRef(from);
   const modelTreeRef = useRef(model);

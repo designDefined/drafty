@@ -8,11 +8,7 @@ type UseIntentSubmitParams<I, O> = {
   from?: () => I;
 } & Omit<IntentParams<I, O>, "key">;
 
-export const useIntentSubmit = <I, O>({
-  intent,
-  from,
-  ...params
-}: UseIntentSubmitParams<I, O>) => {
+export const useIntentSubmit = <I, O>({ intent, from, ...params }: UseIntentSubmitParams<I, O>) => {
   const { send, isWorking } = useIntent<I, O>({ intent, ...params });
   const { values, set, reset } = useIntentInput<I, O>({ intent, from });
 

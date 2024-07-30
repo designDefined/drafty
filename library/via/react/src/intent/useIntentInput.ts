@@ -1,11 +1,5 @@
 import { useCallback, useRef } from "react";
-import {
-  InputTree,
-  Intent,
-  DeepPartial,
-  parseInputTree,
-  parseInitialTree,
-} from "@via/core";
+import { InputTree, Intent, DeepPartial, parseInputTree, parseInitialTree } from "@via/core";
 import { useStore } from "../store";
 
 type UseIntentInputParams<I, O> = {

@@ -1,19 +1,10 @@
-import {
-  Setter,
-  SetterConfig,
-  Store,
-  StoredStatus,
-  StoredValues,
-} from "@via/core";
+import { Setter, SetterConfig, Store, StoredStatus, StoredValues } from "@via/core";
 import { nanoid } from "nanoid";
 import { useCallback, useContext, useEffect, useReducer, useRef } from "react";
 import { ViaContext } from "./storeContext";
 
 type StoredState<T> = [StoredValues<T>, StoredStatus<T>];
-type StoredSet<T> = (
-  setter: Setter<T> | Promise<Setter<T>>,
-  config?: SetterConfig,
-) => void;
+type StoredSet<T> = (setter: Setter<T> | Promise<Setter<T>>, config?: SetterConfig) => void;
 type Subscribe = () => void;
 type UseStoreParams<T> = StoredStatus<T> & { value?: T };
 
@@ -25,10 +16,7 @@ export const useStore = <T>({
   if (!store) throw new Error("useStore must be used within proper context");
   const subscriptionKey = useRef(nanoid());
 
-  const [state, dispatch] = useReducer<
-    (prev: StoredState<T>, next: StoredState<T>) => StoredState<T>,
-    null
-  >(
+  const [state, dispatch] = useReducer<(prev: StoredState<T>, next: StoredState<T>) => StoredState<T>, null>(
     (prev, next) => {
       const [prevValues, prevStatus] = prev;
       const [values, status] = next;
@@ -43,10 +31,7 @@ export const useStore = <T>({
     },
   );
 
-  const set: StoredSet<T> = useCallback(
-    (setter, config) => store.set<T>({ key, setter, config }),
-    [store, key],
-  );
+  const set: StoredSet<T> = useCallback((setter, config) => store.set<T>({ key, setter, config }), [store, key]);
 
   const subscribe = useCallback(() => {
     store.subscribe<T>({

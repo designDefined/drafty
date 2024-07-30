@@ -28,19 +28,13 @@ export type InputTree<T> = T extends object
     : { [K in keyof T]: InputTree<T[K]> }
   : InputLeaf<T>;
 
-const isInputLeaf = <T>(
-  input: InputLeaf<T> | InputTree<T>,
-): input is InputLeaf<T> =>
+const isInputLeaf = <T>(input: InputLeaf<T> | InputTree<T>): input is InputLeaf<T> =>
   typeof input === "object" &&
   typeof input !== null &&
   "value" in input &&
   (typeof input["value"] !== "object" || input["value"] === null);
 
-export const parseInput = <T>(
-  input: T,
-  model?: Model<T>,
-  clearInput?: boolean,
-) => {
+export const parseInput = <T>(input: T, model?: Model<T>, clearInput?: boolean) => {
   try {
     const parsed = model?.(input) ?? input;
     return {
@@ -57,22 +51,16 @@ export const parseInput = <T>(
   }
 };
 
-export const parseInputTree = <T>(
-  inputValue: DeepPartial<T>,
-  models?: ModelTree<T>,
-): InputTree<T> => {
+export const parseInputTree = <T>(inputValue: DeepPartial<T>, models?: ModelTree<T>): InputTree<T> => {
   // parse primitive values
   if (typeof inputValue !== "object" || inputValue === null)
     return parseInput(inputValue, models as Model<T>) as InputTree<T>;
 
   // parse array with model[0]
   if (Array.isArray(inputValue)) {
-    if (!models)
-      return inputValue.map((value) => parseInitialTree(value)) as InputTree<T>;
+    if (!models) return inputValue.map((value) => parseInitialTree(value)) as InputTree<T>;
     if (!Array.isArray(models)) throw new Error("Model is not an array");
-    return inputValue.map((value) =>
-      parseInputTree(value, models[0]),
-    ) as InputTree<T>;
+    return inputValue.map((value) => parseInputTree(value, models[0])) as InputTree<T>;
   }
 
   // parse object
@@ -87,24 +75,16 @@ export const parseInputTree = <T>(
   }, {} as InputTree<T>);
 };
 
-export const parseInitialTree = <T>(
-  initialValue: T,
-  models?: ModelTree<T>,
-): InputTree<T> => {
+export const parseInitialTree = <T>(initialValue: T, models?: ModelTree<T>): InputTree<T> => {
   // parse primitive values
   if (typeof initialValue !== "object" || initialValue === null)
     return parseInput(initialValue, models as Model<T>, true) as InputTree<T>;
 
   // parse array with model[0]
   if (Array.isArray(initialValue)) {
-    if (!models)
-      return initialValue.map((value) =>
-        parseInitialTree(value),
-      ) as InputTree<T>;
+    if (!models) return initialValue.map((value) => parseInitialTree(value)) as InputTree<T>;
     if (!Array.isArray(models)) throw new Error("Model is not an array");
-    return initialValue.map((value) =>
-      parseInitialTree(value, models[0]),
-    ) as InputTree<T>;
+    return initialValue.map((value) => parseInitialTree(value, models[0])) as InputTree<T>;
   }
 
   // parse object
@@ -114,39 +94,28 @@ export const parseInitialTree = <T>(
     (acc as Record<string, unknown>)[key] =
       value === undefined
         ? parseInput(value, undefined, true)
-        : parseInitialTree<typeof value>(
-            value,
-            model as ModelTree<typeof value>,
-          );
+        : parseInitialTree<typeof value>(value, model as ModelTree<typeof value>);
     return acc;
   }, {} as InputTree<T>);
 };
 
 export const getValueFromInputTree = <T>(tree: InputTree<T>): T => {
   if (isInputLeaf(tree)) return tree.value;
-  if (Array.isArray(tree))
-    return tree.map(getValueFromInputTree) as unknown as T;
+  if (Array.isArray(tree)) return tree.map(getValueFromInputTree) as unknown as T;
   return Object.keys(tree).reduce((acc, key) => {
-    acc[key as keyof T] = getValueFromInputTree(
-      (tree as Record<string, InputTree<any>>)[key],
-    );
+    acc[key as keyof T] = getValueFromInputTree((tree as Record<string, InputTree<any>>)[key]);
     return acc;
   }, {} as T);
 };
 
-export const getValidInputFromInputTree = <T>(
-  tree: InputTree<T>,
-): DeepPartial<T> => {
+export const getValidInputFromInputTree = <T>(tree: InputTree<T>): DeepPartial<T> => {
   if (isInputLeaf(tree)) {
     if (tree.error) throw tree.error;
     return tree.input as DeepPartial<T>;
   }
-  if (Array.isArray(tree))
-    return tree.map(getValidInputFromInputTree) as unknown as DeepPartial<T>;
+  if (Array.isArray(tree)) return tree.map(getValidInputFromInputTree) as unknown as DeepPartial<T>;
   return Object.keys(tree).reduce((acc, key) => {
-    acc[key as keyof T] = getValueFromInputTree(
-      (tree as Record<string, InputTree<any>>)[key],
-    );
+    acc[key as keyof T] = getValueFromInputTree((tree as Record<string, InputTree<any>>)[key]);
     return acc;
   }, {} as DeepPartial<T>);
 };
