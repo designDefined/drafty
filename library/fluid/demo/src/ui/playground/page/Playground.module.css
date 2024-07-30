@@ -1,0 +1,37 @@
+.Playground {
+  width: 100vw;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: row-reverse;
+  overflow: scroll;
+}
+.article {
+  flex: 1 0 0;
+  max-width: 1200px;
+  min-width: 1000px;
+  border-radius: 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.MainContentWrapper {
+  position: relative;
+  width: 100%;
+  height: calc(100% - (12px * 4) - 20px - 40px - (24px + (8px * 2)));
+  /* 
+    gap: 12px
+    AddButton: 20px
+    Footer: 40px
+    Header: 24px(Logo) + 8px(padding) * 2
+  */
+}
+.MainContent.amount2 {
+  height: calc((100% - (8px * (2 - 1))) / 2);
+  /*
+    amount: 2; 
+    gap: 8px;
+  */
+}
+.MainContent.amount3 {
+  height: calc((100% - (8px * (3 - 1))) / 3);
+}

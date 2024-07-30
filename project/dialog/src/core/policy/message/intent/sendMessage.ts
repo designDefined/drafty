@@ -1,5 +1,6 @@
-import { IP } from "@/core/policy/intentPolicyFactory";
-import { Message } from "@/core/base/entity/message";
+import { Message } from "@core/entity/message";
+import { viewPolicy } from "@core/policy/view";
+import { IP } from "@policy-maker-old/core";
 
 const input = Message.pick({ text: true });
 const output = Message;
@@ -7,7 +8,9 @@ const output = Message;
 export const IPSendMessage = IP(() => ({
   key: ["message", "sendMessage"],
   model: { input, output },
-  connect: (view, { output }) => [
-    view.message.messages().map((prev) => [output, ...prev]),
+  connect: ({ output }) => [
+    viewPolicy.message
+      .messages()
+      .map((prev) => ({ ...prev, data: [...prev.data, output] })),
   ],
 }));

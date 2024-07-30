@@ -1,18 +1,19 @@
-import { FakeMessage } from "@/core/base/entity/message";
-import { IP } from "@/core/policy/intentPolicyFactory";
+import { PendingMessage } from "@core/entity/message";
+import { viewPolicy } from "@core/policy/view";
+import { IP } from "@policy-maker-old/core";
 import { z } from "zod";
 
-const model = FakeMessage.extend({ isResolve: z.boolean() });
+const model = PendingMessage.extend({ isResolve: z.boolean() });
 
 export const IPPendMessage = IP(() => ({
   key: ["message", "pendMessage"],
   model: { input: model, output: model },
-  connect: (view, { output }) =>
+  connect: ({ output }) =>
     output.isResolve
       ? [
-          view.message
+          viewPolicy.message
             .pendingMessages()
             .map((prev) => prev.filter((message) => message.id !== output.id)),
         ]
-      : [view.message.pendingMessages().map((prev) => [output, ...prev])],
+      : [viewPolicy.message.pendingMessages().map((prev) => [output, ...prev])],
 }));

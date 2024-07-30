@@ -1,16 +1,15 @@
 {
   "name": "pvi-samples",
   "private": true,
-  "packageManager": "yarn@4.1.1",
+  "packageManager": "yarn@4.3.1",
   "scripts": {
-    "dialog": "yarn workspace @client/dialog",
+    "dialog": "yarn workspace @project/dialog",
     "mock": "yarn workspace mock",
     "initialize-db": "yarn mock initialize",
-    "dev:dialog": "concurrently \"yarn mock dialog\" \"yarn dialog dev\""
+    "lib:fluid": "yarn workspace fluid"
   },
   "workspaces": [
     "library/**/*",
-    "core/**/*",
     "project/**/*",
     "mock"
   ],

@@ -1,5 +1,5 @@
-import { IP } from "@policy-maker/core";
-import { useIntent } from "@policy-maker/react";
+import { IP } from "@policy-maker-old/core";
+import { useIntent } from "@policy-maker-old/react";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -11,7 +11,7 @@ const form = z.object({
 const SampleIntentPolicy = IP(() => ({
   key: ["sample"],
   model: { input: form, output: z.string() },
-  connect: [],
+  connect: () => [],
 }));
 
 export default function Register() {

@@ -1,7 +1,9 @@
-import { VP } from "../../../policy/viewPolicyFactory";
-import { Message } from "../../../base/entity/message";
+import { PAGE_NUMBER } from "@core/constant/page";
+import { Message } from "@core/entity/message";
+import { Infinite } from "@core/entity/util/infinite";
+import { VP } from "@policy-maker-old/core";
 
 export const VPMessages = VP(() => ({
   key: ["message", "messages"],
-  model: Message.array(),
+  model: Infinite(Message, PAGE_NUMBER),
 }));

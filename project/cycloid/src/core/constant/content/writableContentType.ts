@@ -1,0 +1,4 @@
+export type WRITABLE_CONTENT_TYPE = {
+  TEXT: "TEXT";
+  STYLED_TEXT: "STYLED_TEXT";
+};

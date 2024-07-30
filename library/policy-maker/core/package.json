@@ -1,9 +1,12 @@
 {
   "name": "@policy-maker/core",
-  "version": "0.0.1",
-  "private": true,
-  "main": "./index.ts",
+  "version:": "0.0.1",
+  "type": "module",
+  "main": "index.ts",
   "peerDependencies": {
-    "zod": "^3.22.4"
+    "zod": "^3.23.0"
+  },
+  "dependencies": {
+    "nanoid": "^5.0.7"
   }
 }

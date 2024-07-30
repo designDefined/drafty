@@ -1,0 +1,25 @@
+{
+  "name": "@via/react",
+  "version:": "0.0.1",
+  "type": "module",
+  "main": "index.ts",
+  "peerDependencies": {
+    "@via/core": "workspace:*"
+  },
+  "dependencies": {
+    "immer": "^10.1.1",
+    "lodash": "^4.17.21",
+    "nanoid": "^5.0.7",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.6",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "typescript": "^5.5.4"
+  }
+}

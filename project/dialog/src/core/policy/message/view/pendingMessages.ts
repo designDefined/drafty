@@ -1,7 +1,7 @@
-import { VP } from "../../../policy/viewPolicyFactory";
-import { FakeMessage } from "../../../base/entity/message";
+import { PendingMessage } from "@core/entity/message";
+import { VP } from "@policy-maker-old/core";
 
 export const VPPendingMessages = VP(() => ({
   key: ["message", "messages", "pending"],
-  model: FakeMessage.array(),
+  model: PendingMessage.array(),
 }));

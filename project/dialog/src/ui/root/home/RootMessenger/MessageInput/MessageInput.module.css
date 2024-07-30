@@ -9,5 +9,8 @@
 .MessageInput .sendButton {
   position: absolute;
   right: 20px;
-  background-color: red;
+}
+
+.MessageInput .sendButton:disabled {
+  opacity: 0.2;
 }

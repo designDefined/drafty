@@ -1,0 +1,6 @@
+/* base */
+@import "./base/reset.css";
+
+/* look */
+@import "./look/color.css";
+@import "./look/typography.css";

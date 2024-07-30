@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "paths": { "@/*": ["./project/cycloid/src/*"] }
+  },
+  "extends": "../../config/ts/vite-react/tsconfig.json",
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

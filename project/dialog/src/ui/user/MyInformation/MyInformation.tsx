@@ -1,10 +1,12 @@
-import { useView } from "@/core/policy";
+import { viewPolicy } from "@core/policy/view";
 import { UserRepository } from "@/core/repository/user";
+import { useView } from "@policy-maker-old/react";
 
 export default function MyInformation() {
-  const { data } = useView((view) => ({
-    policy: view.user.me(),
+  const { data } = useView({
+    policy: viewPolicy.user.me(),
     repository: UserRepository.me,
-  }));
+  });
+
   return <div>{data.name}</div>;
 }

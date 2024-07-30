@@ -1,0 +1,12 @@
+{
+  "name": "@policy-maker/next",
+  "version:": "0.0.1",
+  "type": "module",
+  "main": "index.ts",
+  "peerDependencies": {
+    "@policy-maker/core": "workspace:*",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "zod": "^3.23.0"
+  }
+}

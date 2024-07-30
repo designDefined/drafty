@@ -1,0 +1,9 @@
+{
+  "name": "@policy-maker-old/core",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "peerDependencies": {
+    "zod": "^3.22.4"
+  }
+}

@@ -1,0 +1,45 @@
+/* root */
+:root {
+  font-family: "SUIT Variable", sans-serif;
+  font-size: 18px;
+  font-weight: 200;
+  line-height: 1.25;
+}
+
+/* reset */
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+/* tags */
+h1 {
+  font-weight: 600;
+  font-size: 48px;
+}
+h2 {
+  font-weight: 500;
+  font-size: 40px;
+}
+h3 {
+  font-weight: 400;
+  font-size: 32px;
+}
+h4 {
+  font-weight: 400;
+  font-size: 28px;
+}
+h5 {
+  font-weight: 300;
+  font-size: 24px;
+}
+h6 {
+  font-weight: 300;
+  font-size: 20px;
+}
+
+/* custom */
+.thin {
+  font-weight: 100;
+}
