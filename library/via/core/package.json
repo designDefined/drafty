@@ -4,11 +4,13 @@
   "type": "module",
   "main": "index.ts",
   "dependencies": {
+    "deepmerge": "^4.3.1",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
     "nanoid": "^5.0.7"
   },
   "devDependencies": {
+    "@types/deepmerge": "^2.2.0",
     "@types/lodash": "^4.17.6"
   }
 }

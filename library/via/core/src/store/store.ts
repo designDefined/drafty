@@ -2,8 +2,7 @@ import { produce } from "immer";
 import { Key } from "../util/hashKey";
 import { isPromise } from "../util/promise";
 import { DeepPartial } from "../util/deep";
-import merge from "lodash/merge";
-import cloneDeep from "lodash/cloneDeep";
+import { deepMerge } from "../util/merge";
 
 // Types
 export type Model<T> = (input: unknown) => T;
@@ -131,7 +130,7 @@ export const createStore = () => {
       newValues = { ...values, value: produce(values.value, setter as (draft: T) => void) };
     // deep merge with lodash
     // use cloneDeep for immutability
-    else newValues = { ...values, value: merge(cloneDeep(values.value), setter) };
+    else newValues = { ...values, value: deepMerge(values.value, setter) };
 
     if (config?.clearPromise) newValues.promise = undefined;
     if (config?.error) newValues.error = config.error;
