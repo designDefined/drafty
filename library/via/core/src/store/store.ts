@@ -124,7 +124,8 @@ export const createStore = () => {
     // replace existing value with setter if override
     if (config?.override) newValues = { ...values, value: setter as T };
     // prevent partial merge if value is empty
-    else if (!values.value) newValues = values; // TODO: Is this okay?
+    else if (!values.value)
+      newValues = values; // TODO: Is this okay?
     // merge with immer
     else if (typeof setter === "function")
       newValues = { ...values, value: produce(values.value, setter as (draft: T) => void) };
@@ -217,7 +218,6 @@ export const createStore = () => {
     // add subscription
     stored.subscribers.set(subscriptionKey, subscriber);
     return () => {
-      subscriber.fn([{ value: undefined, promise: new Promise(() => {}), error: undefined }, stored.status]);
       stored.subscribers.delete(subscriptionKey);
       // TODO: Add cache logic
     };
