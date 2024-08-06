@@ -1,7 +1,8 @@
-import { LoginIntent } from "@/core/intent/user/login";
-import { Main, Input, Div, H5, H2, Button } from "@fluid/core";
-import { useIntentSubmit } from "library/via/react";
 import { useNavigate } from "react-router-dom";
+import { Button, Div, H2, H5, Input, Main } from "@fluid/core";
+import { useIntentSubmit } from "library/via/react";
+
+import { LoginIntent } from "@/core/intent/user/login";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,11 +14,7 @@ export default function Login() {
     intent: LoginIntent(),
   });
   return (
-    <Main
-      flex={[1, 1, "auto"]}
-      flow={["column", "nowrap", "center", "center"]}
-      spacing={[20, 48]}
-    >
+    <Main flex={[1, 1, "auto"]} flow={["column", "nowrap", "center", "center"]} spacing={[20, 48]}>
       <H2 className="thin">로그인</H2>
       <Div flow={["row", "nowrap", "center"]} spacing={[16, 12]}>
         <H5>이름:</H5>

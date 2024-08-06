@@ -751,7 +751,6 @@ __metadata:
   dependencies:
     "@fluid/core": "workspace:^"
     "@fluid/minimal": "workspace:^"
-    "@types/deepmerge": "npm:^2.2.0"
     "@types/react": "npm:^18.2.66"
     "@types/react-dom": "npm:^18.2.22"
     "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
@@ -759,7 +758,6 @@ __metadata:
     "@via/core": "workspace:^"
     "@via/react": "workspace:^"
     "@vitejs/plugin-react": "npm:^4.2.1"
-    deepmerge: "npm:^4.3.1"
     eslint: "npm:^8.57.0"
     eslint-plugin-import: "npm:^2.29.1"
     eslint-plugin-react-hooks: "npm:^4.6.0"
