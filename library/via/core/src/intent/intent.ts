@@ -1,17 +1,17 @@
 import { Model, Store } from "../store";
 import { Falsy } from "../util/falsy";
 import { hashKeys, RawKey } from "../util/hashKey";
-import { ModelTree } from "./input";
+import { UnknownInput, Inferred } from "./input";
 
 export type IOModel<I, O> = {
-  items?: ModelTree<I>;
   input?: Model<I>;
   output?: Model<O>;
 };
 export type To<I, O> = (input: I) => O | Promise<O>;
 export type Next = (store: Store) => void;
-export type IntentParams<I, O> = {
+export type IntentParams<Input extends UnknownInput, O, I extends Inferred<Input> = Inferred<Input>> = {
   key: (RawKey | Falsy)[];
+  input?: Input;
   to?: To<I, O>;
   from?: () => I;
   next?: (result: { i: I; o: O }) => Next[];
@@ -26,11 +26,13 @@ export type StoredIntent<I, O> = {
 };
 
 export const Intent =
-  <I, O, Deps extends unknown[] = never[]>(params: (...deps: Deps) => IntentParams<I, O>) =>
+  <Input extends UnknownInput, O, Deps extends unknown[] = never[]>(
+    params: (...deps: Deps) => IntentParams<Input, O>,
+  ) =>
   (...args: Deps) => {
     const intent = params(...args);
     const key = hashKeys(intent.key);
     return { ...intent, key };
   };
 
-export type Intent<I, O> = ReturnType<ReturnType<typeof Intent<I, O, unknown[]>>>;
+export type Intent<Input extends UnknownInput, O> = ReturnType<ReturnType<typeof Intent<Input, O, unknown[]>>>;

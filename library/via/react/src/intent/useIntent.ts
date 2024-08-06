@@ -1,18 +1,19 @@
 import { useCallback, useRef } from "react";
 import { Intent, IntentParams, StoredIntent, isPromise } from "@via/core";
 import { useStore } from "../store";
+import { Inferred, UnknownInput } from "@via/core";
 
-type UseIntentParams<I, O> = {
-  intent: Intent<I, O>;
-} & Omit<IntentParams<I, O>, "key">;
+type UseIntentParams<Input extends UnknownInput, O> = {
+  intent: Intent<Input, O>;
+} & Omit<IntentParams<Input, O>, "key" | "input">;
 
-export const useIntent = <I, O>({
+export const useIntent = <Input extends UnknownInput, O, I extends Inferred<Input> = Inferred<Input>>({
   intent: { to, next, catch: _catch, model, ...intentStatus },
   to: overrideTo,
   next: overrideNext,
   catch: overrideCatch,
   ...overrideStatus
-}: UseIntentParams<I, O>) => {
+}: UseIntentParams<Input, O>) => {
   const storeStatusRef = useRef({ ...intentStatus, ...overrideStatus });
   const toRef = useRef(overrideTo ?? to);
   const modelRef = useRef(model?.input);

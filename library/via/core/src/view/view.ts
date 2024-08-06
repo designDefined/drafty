@@ -13,9 +13,9 @@ export const View =
   (...args: Parameters<typeof params>) => {
     const view = params(...args);
     const key = hashKeys(view.key);
-    const invalidate = (store: Store) => store.invalidate(key);
+    const invalidate = (store: Store) => store.invalidateWith(key);
     const set = (setter: Setter<T> | Promise<Setter<T>>, config?: SetterConfig) => (store: Store) =>
-      store.set({ key, setter, config });
+      store.setWith({ key, setter, config });
     return { ...view, key, invalidate, set };
   };
 

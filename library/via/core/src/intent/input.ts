@@ -1,121 +1,114 @@
-import { Model } from "../store";
 import { DeepPartial } from "../util/deep";
 
-// Config
-export type InputConfig = {
-  useInitialValue?: boolean;
-  deepCompareDiff?: boolean;
+export type Leaf<T> = { _isLeaf: true; parser: Parser<T>; value: T; inputValue?: T; error: unknown };
+export type Tree<T> =
+  | Leaf<T>
+  | {
+      [K in keyof T]: Tree<T[K]>;
+    };
+
+type Parser<T> = (arg: unknown) => T;
+
+export type ParserModel<T> =
+  | Parser<T>
+  | {
+      [key in keyof T]: ParserModel<T[key]>;
+    };
+export type UnknownInput = ParserModel<unknown>;
+
+type UndefinedToOptional<T> = {
+  [K in keyof T as undefined extends T[K] ? K : never]?: Exclude<T[K], undefined>;
+} & {
+  [K in keyof T as undefined extends T[K] ? never : K]: T[K];
 };
 
-// Model Types
-export type ModelTree<T> = T extends object
-  ? T extends any[]
-    ? [ModelTree<T[number]>]
-    : { [K in keyof T]: ModelTree<T[K]> }
-  : Model<T>;
+export type Inferred<T extends UnknownInput> = T extends Parser<infer U>
+  ? U
+  : T extends { [key in keyof T]: ParserModel<T[key]> }
+    ? UndefinedToOptional<{ [K in keyof T]: Inferred<T[K]> }>
+    : never;
 
-// Input Types
-export type InputLeaf<T> = T extends object
-  ? never
-  : {
-      value: T;
-      input?: T;
-      error?: unknown;
-    };
-export type InputTree<T> = T extends object
-  ? T extends any[]
-    ? InputTree<T[number]>[]
-    : { [K in keyof T]: InputTree<T[K]> }
-  : InputLeaf<T>;
+export type GetTreeFromParserModel<T> = T extends Parser<infer U>
+  ? Leaf<U>
+  : T extends object
+    ? { [K in keyof T]: GetTreeFromParserModel<T[K]> }
+    : never;
 
-const isInputLeaf = <T>(input: InputLeaf<T> | InputTree<T>): input is InputLeaf<T> =>
-  typeof input === "object" &&
-  typeof input !== null &&
-  "value" in input &&
-  (typeof input["value"] !== "object" || input["value"] === null);
+export type GetPartialInputFromTree<T> = T extends Leaf<infer U>
+  ? U
+  : T extends object
+    ? { [K in keyof T]?: GetPartialInputFromTree<T[K]> }
+    : never;
 
-export const parseInput = <T>(input: T, model?: Model<T>, clearInput?: boolean) => {
+const isLeaf = <T>(value: any): value is Leaf<T> => {
+  return typeof value === "object" && value !== null && "_isLeaf" in value && value["_isLeaf"] === true;
+};
+
+const isParser = <T>(parser: any): parser is Parser<T> => {
+  return typeof parser === "function";
+};
+
+export const parseLeaf = <T>(value: T, parser: Parser<T>): Partial<Leaf<T>> => {
   try {
-    const parsed = model?.(input) ?? input;
-    return {
-      value: parsed,
-      input: clearInput ? undefined : parsed,
-      error: null,
-    };
+    const parsed = parser(value);
+    return { value: parsed, inputValue: parsed, error: null };
   } catch (e) {
+    return { value, inputValue: value, error: e };
+  }
+};
+
+export const parseInitialTree = <Input extends UnknownInput>(
+  value: Inferred<Input>,
+  parser: Input,
+  useInitialValue?: boolean,
+): GetTreeFromParserModel<Input> => {
+  if (isParser(parser)) {
     return {
-      value: input,
-      input: clearInput ? undefined : input,
-      error: e,
-    };
+      _isLeaf: true,
+      parser,
+      value,
+      inputValue: useInitialValue ? value : undefined,
+      error: null,
+    } as GetTreeFromParserModel<Input>;
   }
+  const tree: any = {};
+  for (const key in parser) {
+    // @ts-ignore
+    tree[key] = parseInitialTree(value[key], parser[key], useInitialValue);
+  }
+  return tree;
 };
 
-export const parseInputTree = <T>(inputValue: DeepPartial<T>, models?: ModelTree<T>): InputTree<T> => {
-  // parse primitive values
-  if (typeof inputValue !== "object" || inputValue === null)
-    return parseInput(inputValue, models as Model<T>) as InputTree<T>;
+export const parsePartialTree = <Input extends UnknownInput>(
+  input: GetPartialInputFromTree<GetTreeFromParserModel<Input>>,
+  parser: Input,
+): DeepPartial<GetTreeFromParserModel<Input>> => {
+  if (isParser(parser)) return parseLeaf(input, parser) as DeepPartial<GetTreeFromParserModel<Input>>;
 
-  // parse array with model[0]
-  if (Array.isArray(inputValue)) {
-    if (!models) return inputValue.map((value) => parseInitialTree(value)) as InputTree<T>;
-    if (!Array.isArray(models)) throw new Error("Model is not an array");
-    return inputValue.map((value) => parseInputTree(value, models[0])) as InputTree<T>;
+  const result: any = {};
+  if (typeof input !== "object" || typeof parser !== "object") throw new Error("input must be an object");
+  for (const key in input) {
+    result[key] = parsePartialTree(input[key], parser[key as unknown as keyof Input] as any);
   }
-
-  // parse object
-  return Object.keys(inputValue).reduce((acc, key) => {
-    const value = inputValue[key as keyof T];
-    const model = models?.[key as keyof ModelTree<T>];
-    (acc as Record<string, unknown>)[key] =
-      value === undefined
-        ? parseInput(value, undefined, true)
-        : parseInputTree<typeof value>(value, model as ModelTree<typeof value>);
-    return acc;
-  }, {} as InputTree<T>);
+  return result;
 };
 
-export const parseInitialTree = <T>(initialValue: T, models?: ModelTree<T>): InputTree<T> => {
-  // parse primitive values
-  if (typeof initialValue !== "object" || initialValue === null)
-    return parseInput(initialValue, models as Model<T>, true) as InputTree<T>;
-
-  // parse array with model[0]
-  if (Array.isArray(initialValue)) {
-    if (!models) return initialValue.map((value) => parseInitialTree(value)) as InputTree<T>;
-    if (!Array.isArray(models)) throw new Error("Model is not an array");
-    return initialValue.map((value) => parseInitialTree(value, models[0])) as InputTree<T>;
+export const getValidInputFromTree = <Input extends UnknownInput>(
+  values: GetTreeFromParserModel<Input>,
+): Inferred<Input> | undefined => {
+  if (isLeaf<Inferred<Input>>(values)) {
+    if (values.error) throw values.error;
+    return values.inputValue;
   }
 
-  // parse object
-  return Object.keys(initialValue).reduce((acc, key) => {
-    const value = initialValue[key as keyof T];
-    const model = models?.[key as keyof ModelTree<T>];
-    (acc as Record<string, unknown>)[key] =
-      value === undefined
-        ? parseInput(value, undefined, true)
-        : parseInitialTree<typeof value>(value, model as ModelTree<typeof value>);
+  return Object.keys(values).reduce((acc, key) => {
+    const value = values[key as keyof typeof values];
+    if (isLeaf(value)) {
+      if (value.error) throw value.error;
+      acc[key] = value.inputValue;
+    } else {
+      acc[key] = getValidInputFromTree(value as any);
+    }
     return acc;
-  }, {} as InputTree<T>);
-};
-
-export const getValueFromInputTree = <T>(tree: InputTree<T>): T => {
-  if (isInputLeaf(tree)) return tree.value;
-  if (Array.isArray(tree)) return tree.map(getValueFromInputTree) as unknown as T;
-  return Object.keys(tree).reduce((acc, key) => {
-    acc[key as keyof T] = getValueFromInputTree((tree as Record<string, InputTree<any>>)[key]);
-    return acc;
-  }, {} as T);
-};
-
-export const getValidInputFromInputTree = <T>(tree: InputTree<T>): DeepPartial<T> => {
-  if (isInputLeaf(tree)) {
-    if (tree.error) throw tree.error;
-    return tree.input as DeepPartial<T>;
-  }
-  if (Array.isArray(tree)) return tree.map(getValidInputFromInputTree) as unknown as DeepPartial<T>;
-  return Object.keys(tree).reduce((acc, key) => {
-    acc[key as keyof T] = getValueFromInputTree((tree as Record<string, InputTree<any>>)[key]);
-    return acc;
-  }, {} as DeepPartial<T>);
+  }, {} as any);
 };

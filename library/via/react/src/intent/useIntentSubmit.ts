@@ -1,20 +1,28 @@
-import { getValidInputFromInputTree, Intent, IntentParams } from "@via/core";
+import { getValidInputFromTree, Inferred, Intent, IntentParams, UnknownInput } from "@via/core";
 import { useIntent } from "./useIntent";
 import { useIntentInput } from "./useIntentInput";
 import { useCallback, useMemo } from "react";
 
-type UseIntentSubmitParams<I, O> = {
-  intent: Intent<I, O>;
+type UseIntentSubmitParams<Input extends UnknownInput, O, I extends Inferred<Input> = Inferred<Input>> = {
+  intent: Intent<Input, O>;
   from?: () => I;
-} & Omit<IntentParams<I, O>, "key">;
+  config?: { useInitialValue: boolean };
+} & Omit<IntentParams<Input, O>, "key" | "input">;
 
-export const useIntentSubmit = <I, O>({ intent, from, ...params }: UseIntentSubmitParams<I, O>) => {
-  const { send, isWorking } = useIntent<I, O>({ intent, ...params });
-  const { values, set, reset } = useIntentInput<I, O>({ intent, from });
+export const useIntentSubmit = <Input extends UnknownInput, O>({
+  intent,
+  from,
+  config,
+  ...params
+}: UseIntentSubmitParams<Input, O>) => {
+  const { send, isWorking } = useIntent<Input, O>({ intent, ...params });
+  const { values, set, reset } = useIntentInput<Input, O>({ intent, from, config });
 
   const { inputValues, error } = useMemo(() => {
     try {
-      const inputValues = getValidInputFromInputTree(values);
+      const inputValues = getValidInputFromTree(values);
+      if (!inputValues) throw new Error("Invalid input values");
+      if (Object.keys(inputValues).length === 0) throw new Error("No input values");
       return { inputValues, error: undefined };
     } catch (e) {
       return { inputValues: undefined, error: e };
@@ -22,8 +30,8 @@ export const useIntentSubmit = <I, O>({ intent, from, ...params }: UseIntentSubm
   }, [values]);
 
   const submit = useCallback(() => {
-    if (error) return Promise.reject(error);
-    return send(inputValues as I).then((response) => {
+    if (error || !inputValues) return Promise.reject(error);
+    return send(inputValues).then((response) => {
       reset();
       return response;
     });

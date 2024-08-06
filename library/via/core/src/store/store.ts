@@ -67,6 +67,7 @@ type _RefreshParams<T> = {
 };
 type _CheckParams<T> = {
   stored: Stored<T>;
+  invalidated?: boolean;
 };
 
 export type GetParams<T> = _CreateParams<T>;
@@ -104,7 +105,7 @@ export const createStore = () => {
 
   const _update = <T>({ key, setter, config }: _UpdateParams<T>) => {
     // check if request is valid
-    if (config?.override && typeof setter === "function") throw new Error("Cannot override with function setter");
+    // if (config?.override && typeof setter === "function") throw new Error("Cannot override with function setter");
 
     // read stored
     const stored = _read<T>({ key });
@@ -123,8 +124,7 @@ export const createStore = () => {
     // replace existing value with setter if override
     if (config?.override) newValues = { ...values, value: setter as T };
     // prevent partial merge if value is empty
-    else if (!values.value)
-      newValues = values; // TODO: Is this okay?
+    else if (!values.value) newValues = values; // TODO: Is this okay?
     // merge with immer
     else if (typeof setter === "function")
       newValues = { ...values, value: produce(values.value, setter as (draft: T) => void) };
@@ -180,12 +180,13 @@ export const createStore = () => {
     }
   };
 
-  const _check = <T>({ stored }: _CheckParams<T>) => {
+  const _check = <T>({ stored, invalidated }: _CheckParams<T>) => {
     if (
       // refresh if values are totally empty
       (stored.values.value === undefined && stored.values.promise === undefined && stored.values.error === undefined) ||
       // or stored is stale
-      stored.updatedAt + (stored.status.staleTime ?? Infinity) < Date.now()
+      stored.updatedAt + (stored.status.staleTime ?? Infinity) < Date.now() ||
+      invalidated
     ) {
       _refresh<T>({ key: stored.status.key });
     }
@@ -218,6 +219,7 @@ export const createStore = () => {
     stored.subscribers.set(subscriptionKey, subscriber);
     return () => {
       stored.subscribers.delete(subscriptionKey);
+      if (stored.subscribers.size < 1) store.delete(key);
       // TODO: Add cache logic
     };
   };
@@ -226,14 +228,30 @@ export const createStore = () => {
     const stored = _read({ key });
     if (!stored) return;
     stored.updatedAt = 0;
-    _check({ stored });
+    _check({ stored, invalidated: true });
+  };
+
+  const setWith = <T>({ key, setter, config }: SetParams<T>) => {
+    store.forEach((_, storedKey) => {
+      if (!storedKey.startsWith(key)) return;
+      set({ key: storedKey, setter, config });
+    });
+  };
+
+  const invalidateWith = (key: Key) => {
+    store.forEach((stored, storedKey) => {
+      if (!storedKey.startsWith(key)) return;
+      stored.updatedAt = 0;
+      _check({ stored, invalidated: true });
+    });
   };
 
   const checkAll = () => store.forEach((stored) => _check({ stored }));
+
   const invalidateAll = () =>
     store.forEach((stored) => {
       stored.updatedAt = 0;
-      _check({ stored });
+      _check({ stored, invalidated: true });
     });
 
   const debug = () => store;
@@ -243,6 +261,8 @@ export const createStore = () => {
     set,
     subscribe,
     invalidate,
+    setWith,
+    invalidateWith,
     checkAll,
     invalidateAll,
     debug,
