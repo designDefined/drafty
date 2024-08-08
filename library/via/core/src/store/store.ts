@@ -3,11 +3,16 @@ import { Key } from "../util/hashKey";
 import { isPromise } from "../util/promise";
 import { DeepPartial } from "../util/deep";
 import { deepMerge } from "../util/merge";
+import { debugStore, DebugStoreConfig } from "./debug";
 
 // Types
-export type Model<T> = (input: unknown) => T;
 export type From<T> = () => T | Promise<T>;
-export type Setter<T> = T | DeepPartial<T> | ((draft: T) => void);
+
+// Setter
+export type SetterWhole<T> = T;
+export type SetterPartial<T> = DeepPartial<T>;
+export type SetterFn<T> = (draft: T) => void;
+export type Setter<T> = SetterWhole<T> | SetterPartial<T> | SetterFn<T>;
 export type SetterConfig = {
   override?: boolean;
   clearPromise?: boolean;
@@ -19,41 +24,36 @@ export type StoredValues<T> = {
   promise?: Promise<Setter<T> | void>;
   error?: unknown;
 };
-export type StoredStatus<T> = {
+export type StoredInfo<T> = {
   key: string;
-  model?: Model<T>;
   from?: From<T>;
   staleTime?: number;
   gcTime?: number;
 };
 export type Subscriber<T> = {
-  fn: (next: [StoredValues<T>, StoredStatus<T>]) => void;
-  isTemporary?: boolean;
+  onNext: (next: [StoredValues<T>, StoredInfo<T>]) => void;
+  slice?: (whole: T) => DeepPartial<T>;
 };
 
 // Config
-export type StoreConfig = {};
+export type StoreConfig = {
+  debug?: undefined | false | DebugStoreConfig;
+};
 
 // API
 export type Stored<T> = {
   values: StoredValues<T>;
-  status: StoredStatus<T>;
+  info: StoredInfo<T>;
   subscribers: Map<Key, Subscriber<T>>;
   updatedAt: number;
   gcTimer: number | null;
 };
 
-type _CreateParams<T> = StoredStatus<T> & {
-  value?: T;
-  promise?: Promise<Setter<T> | void>;
-  error?: unknown;
-};
-type _ReadParams = {
-  key: Key;
-};
+type _CreateParams<T> = StoredInfo<T> & StoredValues<T>;
+type _ReadParams = { key: Key };
 type _UpdateParams<T> = {
   key: Key;
-  setter: Setter<T>;
+  setter: Setter<T> | undefined;
   config?: SetterConfig;
 };
 type _UpdateAsyncParams<T> = {
@@ -82,14 +82,15 @@ export type SubscribeParams<T> = {
   subscriber: Subscriber<T>;
 } & Omit<GetParams<T>, "key">;
 
-export const createStore = () => {
-  const store = new Map<Key, Stored<any>>();
+export const createStore = (config: StoreConfig) => {
+  const store = !!config.debug ? debugStore(config.debug) : new Map<Key, Stored<any>>();
 
   // private method starts with underscore
-  const _create = <T>({ key, value, promise, error, ...rest }: _CreateParams<T>) => {
+
+  const _create = <T>({ key, value, promise, error, ...info }: _CreateParams<T>) => {
     const created: Stored<T> = {
       values: { value, promise, error },
-      status: { key, ...rest },
+      info: { key, ...info },
       subscribers: new Map<Key, Subscriber<T>>(),
       updatedAt: 0,
       gcTimer: null,
@@ -118,7 +119,7 @@ export const createStore = () => {
     }
 
     // update stored
-    const { values, status } = stored;
+    const { values, info } = stored;
     let newValues: StoredValues<T>;
 
     // replace existing value with setter if override
@@ -137,30 +138,27 @@ export const createStore = () => {
     stored.values = newValues;
     stored.updatedAt = Date.now();
     stored.subscribers.forEach((cb) => {
-      cb.fn([newValues, status]);
+      cb.onNext([newValues, info]);
     });
   };
 
   const _updateAsync = <T>({ key, promise, config }: _UpdateAsyncParams<T>) => {
     const stored = _read<T>({ key });
     if (!stored) return;
+    if (stored.values.promise) return;
 
     promise
       .then((setter) => {
         _update({ key, setter, config: { ...config, clearPromise: true } });
       })
       .catch((e) => {
-        _update({
-          key,
-          setter: () => {},
-          config: { ...config, clearPromise: true, error: e },
-        });
+        _update({ key, setter: undefined, config: { ...config, clearPromise: true, error: e } });
       });
 
-    const newValues = { ...stored.values, promise, config };
+    const newValues = { ...stored.values, promise };
     stored.values = newValues;
     stored.subscribers.forEach((cb) => {
-      cb.fn([newValues, stored.status]);
+      cb.onNext([newValues, stored.info]);
     });
   };
 
@@ -169,7 +167,7 @@ export const createStore = () => {
     if (!stored) return;
     if (stored.values.promise) return;
 
-    const from = fromOverride ?? stored.status.from;
+    const from = fromOverride ?? stored.info.from;
     if (!from) throw new Error("No fetcher found");
 
     const setter = from();
@@ -185,14 +183,15 @@ export const createStore = () => {
       // refresh if values are totally empty
       (stored.values.value === undefined && stored.values.promise === undefined && stored.values.error === undefined) ||
       // or stored is stale
-      stored.updatedAt + (stored.status.staleTime ?? Infinity) < Date.now() ||
+      stored.updatedAt + (stored.info.staleTime ?? Infinity) < Date.now() ||
       invalidated
     ) {
-      _refresh<T>({ key: stored.status.key });
+      _refresh<T>({ key: stored.info.key });
     }
   };
 
   // public
+
   const get = <T>({ key, ...rest }: GetParams<T>) => {
     const read = _read<T>({ key });
     const stored = read ?? _create({ key, ...rest });
@@ -210,10 +209,9 @@ export const createStore = () => {
 
   const subscribe = <T>({ key, subscriptionKey, subscriber }: SubscribeParams<T>) => {
     const stored = _read<T>({ key });
-    if (!stored) throw new Error("No stored found"); // TODO: Error handling
-
-    // temporary subscription can't override existing one
-    if (subscriber.isTemporary && stored.subscribers.has(subscriptionKey)) return () => {};
+    if (!stored) {
+      throw new Error("No stored found");
+    } // TODO: Error handling
 
     // add subscription
     stored.subscribers.set(subscriptionKey, subscriber);
@@ -224,6 +222,16 @@ export const createStore = () => {
     };
   };
 
+  const clear = (key: Key) => {
+    const stored = _read({ key });
+    if (!stored) return;
+    stored.values = {};
+    stored.updatedAt = 0;
+    stored.subscribers.forEach((cb) => {
+      cb.onNext([stored.values, stored.info]);
+    });
+  };
+
   const invalidate = (key: Key) => {
     const stored = _read({ key });
     if (!stored) return;
@@ -231,14 +239,14 @@ export const createStore = () => {
     _check({ stored, invalidated: true });
   };
 
-  const setWith = <T>({ key, setter, config }: SetParams<T>) => {
+  const setFilter = <T>({ key, setter, config }: SetParams<T>) => {
     store.forEach((_, storedKey) => {
       if (!storedKey.startsWith(key)) return;
       set({ key: storedKey, setter, config });
     });
   };
 
-  const invalidateWith = (key: Key) => {
+  const invalidateFilter = (key: Key) => {
     store.forEach((stored, storedKey) => {
       if (!storedKey.startsWith(key)) return;
       stored.updatedAt = 0;
@@ -254,18 +262,26 @@ export const createStore = () => {
       _check({ stored, invalidated: true });
     });
 
-  const debug = () => store;
+  const throwError = (key: string, error: unknown) => {
+    if (config.debug) {
+      console.log(`THROW ${key}`);
+      store.get(key);
+    }
+
+    return error;
+  };
 
   return {
     get,
     set,
     subscribe,
+    clear,
     invalidate,
-    setWith,
-    invalidateWith,
+    setFilter,
+    invalidateFilter,
     checkAll,
     invalidateAll,
-    debug,
+    throwError,
   };
 };
 

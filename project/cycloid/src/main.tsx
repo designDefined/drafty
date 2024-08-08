@@ -8,7 +8,7 @@ import { router } from "./router/index.tsx";
 
 import "./style/index.css";
 
-const store = createStore();
+const store = createStore({ debug: { lens: [] } });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Via store={store}>

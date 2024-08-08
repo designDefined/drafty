@@ -1,12 +1,8 @@
-import { Model, Store } from "../store";
+import { Store } from "../store";
 import { Falsy } from "../util/falsy";
 import { hashKeys, RawKey } from "../util/hashKey";
 import { UnknownInput, Inferred } from "./input";
 
-export type IOModel<I, O> = {
-  input?: Model<I>;
-  output?: Model<O>;
-};
 export type To<I, O> = (input: I) => O | Promise<O>;
 export type Next = (store: Store) => void;
 export type IntentParams<Input extends UnknownInput, O, I extends Inferred<Input> = Inferred<Input>> = {
@@ -14,9 +10,8 @@ export type IntentParams<Input extends UnknownInput, O, I extends Inferred<Input
   input?: Input;
   to?: To<I, O>;
   from?: () => I;
-  next?: (result: { i: I; o: O }) => Next[];
+  next?: (result: { i: I; o: O }) => (Next | Falsy)[];
   catch?: (result: { i: I; error: unknown }) => Next[];
-  model?: IOModel<I, O>;
 };
 
 export type StoredIntent<I, O> = {

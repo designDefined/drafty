@@ -1,62 +1,50 @@
-import { Setter, SetterConfig, Store, StoredStatus, StoredValues } from "@via/core";
+import { DeepPartial, Setter, SetterConfig, Store, StoredInfo, StoredValues } from "@via/core";
 import { nanoid } from "nanoid";
 import { useCallback, useContext, useEffect, useReducer, useRef } from "react";
 import { ViaContext } from "./storeContext";
 
-type StoredState<T> = [StoredValues<T>, StoredStatus<T>];
+type StoredConfig<T> = { slice?: (whole: T) => DeepPartial<T> };
+type StoredState<T> = [StoredValues<T>, StoredInfo<T>];
 type StoredSet<T> = (setter: Setter<T> | Promise<Setter<T>>, config?: SetterConfig) => void;
-type Subscribe = () => void;
-type UseStoreParams<T> = StoredStatus<T> & { value?: T };
+type UseStoreParams<T> = StoredInfo<T> & { value?: T; config?: StoredConfig<T> };
 
-export const useStore = <T>({
-  key,
-  ...params
-}: UseStoreParams<T>): [StoredState<T>, StoredSet<T>, Subscribe, Store] => {
+export const useStore = <T>({ key, config, ...params }: UseStoreParams<T>): [StoredState<T>, StoredSet<T>, Store] => {
   const store = useContext(ViaContext);
   if (!store) throw new Error("useStore must be used within proper context");
 
-  // subscriptionKey remains same throughout the lifecycle of the component
+  // subscriptionKey and configs remains same throughout the lifecycle of the component
   const subscriptionKey = useRef(nanoid());
+  const configRef = useRef(config);
 
-  const [state, dispatch] = useReducer<(prev: StoredState<T>, next: StoredState<T>) => StoredState<T>, null>(
+  const [[values, info], dispatch] = useReducer<(prev: StoredState<T>, next: StoredState<T>) => StoredState<T>, null>(
     (prev, next) => {
-      const [prevValues, prevStatus] = prev;
-      const [values, status] = next;
-      return Object.is(values, prevValues) && Object.is(status, prevStatus) // TODO: Add slice for rerender optimization
+      return Object.is(prev[0], next[0]) && Object.is(prev[1], next[1]) // TODO: Add slice for rerender optimization
         ? prev
-        : [values, status];
+        : next;
     },
     null,
     () => {
-      const { values, status } = store.get<T>({ ...params, key });
-      return [values, status];
+      const { values, info } = store.get<T>({ ...params, key });
+      return [values, info];
     },
   );
 
-  const set: StoredSet<T> = useCallback((setter, config) => store.set<T>({ key, setter, config }), [store, key]);
+  // if key changes, re-initiate the store
+  if (key !== info.key) {
+    const { values, info } = store.get<T>({ ...params, key });
+    dispatch([values, info]);
+  }
 
-  const temporalSubscribe = useCallback(() => {
-    store.subscribe<T>({
-      key,
-      subscriptionKey: subscriptionKey.current,
-      subscriber: { fn: dispatch, isTemporary: true },
-    });
-  }, [key, store]);
+  const set: StoredSet<T> = useCallback((setter, config) => store.set<T>({ key, setter, config }), [store, key]);
 
   useEffect(() => {
     return store.subscribe<T>({
       ...params,
+      key: info.key,
       subscriptionKey: subscriptionKey.current,
-      subscriber: { fn: dispatch },
-      key,
+      subscriber: { onNext: dispatch, slice: configRef.current?.slice },
     });
-  }, [key]); // subscription depends nothing but the key
+  }, [info.key]); // subscription depends nothing but the key
 
-  // if key is changed, re-initiate the store
-  if (key !== state[1].key) {
-    const { values, status } = store.get<T>({ ...params, key });
-    return [[values, status], set, temporalSubscribe, store];
-  }
-
-  return [state, set, temporalSubscribe, store];
+  return [[values, info], set, store];
 };

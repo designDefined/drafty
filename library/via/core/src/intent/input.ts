@@ -7,7 +7,7 @@ export type Tree<T> =
       [K in keyof T]: Tree<T[K]>;
     };
 
-type Parser<T> = (arg: unknown) => T;
+export type Parser<T> = (arg: unknown) => T;
 
 export type ParserModel<T> =
   | Parser<T>
@@ -22,23 +22,18 @@ type UndefinedToOptional<T> = {
   [K in keyof T as undefined extends T[K] ? never : K]: T[K];
 };
 
-export type Inferred<T extends UnknownInput> = T extends Parser<infer U>
-  ? U
-  : T extends { [key in keyof T]: ParserModel<T[key]> }
-    ? UndefinedToOptional<{ [K in keyof T]: Inferred<T[K]> }>
-    : never;
+export type Inferred<T extends UnknownInput> =
+  T extends Parser<infer U>
+    ? U
+    : T extends { [key in keyof T]: ParserModel<T[key]> }
+      ? UndefinedToOptional<{ [K in keyof T]: Inferred<T[K]> }>
+      : never;
 
-export type GetTreeFromParserModel<T> = T extends Parser<infer U>
-  ? Leaf<U>
-  : T extends object
-    ? { [K in keyof T]: GetTreeFromParserModel<T[K]> }
-    : never;
+export type GetTreeFromParserModel<T> =
+  T extends Parser<infer U> ? Leaf<U> : T extends object ? { [K in keyof T]: GetTreeFromParserModel<T[K]> } : never;
 
-export type GetPartialInputFromTree<T> = T extends Leaf<infer U>
-  ? U
-  : T extends object
-    ? { [K in keyof T]?: GetPartialInputFromTree<T[K]> }
-    : never;
+export type GetPartialInputFromTree<T> =
+  T extends Leaf<infer U> ? U : T extends object ? { [K in keyof T]?: GetPartialInputFromTree<T[K]> } : never;
 
 const isLeaf = <T>(value: any): value is Leaf<T> => {
   return typeof value === "object" && value !== null && "_isLeaf" in value && value["_isLeaf"] === true;

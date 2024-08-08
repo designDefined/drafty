@@ -23,7 +23,7 @@ export const useIntentInput = <Input extends UnknownInput, O>({
 }: UseIntentInputParams<Input, O>) => {
   const inputRef = useRef(input);
   const fromRef = useRef(fromOverride ?? from);
-  const [[state], setInternal, , store] = useStore<GetTreeFromParserModel<Input>>({
+  const [[state], setInternal, store] = useStore<GetTreeFromParserModel<Input>>({
     key: "input_" + key,
     from: () => {
       if (!fromRef.current) throw new Error("no from provided");

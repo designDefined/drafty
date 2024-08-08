@@ -8,20 +8,18 @@ type UseIntentParams<Input extends UnknownInput, O> = {
 } & Omit<IntentParams<Input, O>, "key" | "input">;
 
 export const useIntent = <Input extends UnknownInput, O, I extends Inferred<Input> = Inferred<Input>>({
-  intent: { to, next, catch: _catch, model, ...intentStatus },
+  intent: { to, next, catch: _catch, ...intentInfo },
   to: overrideTo,
   next: overrideNext,
   catch: overrideCatch,
-  ...overrideStatus
+  ...overrideInfo
 }: UseIntentParams<Input, O>) => {
-  const storeStatusRef = useRef({ ...intentStatus, ...overrideStatus });
+  const storeInfoRef = useRef({ ...intentInfo, ...overrideInfo });
   const toRef = useRef(overrideTo ?? to);
-  const modelRef = useRef(model?.input);
   const nextRef = useRef(overrideNext ?? next);
   const catchRef = useRef(overrideCatch ?? _catch);
-  const [[intent, status], set, , store] = useStore<StoredIntent<I, O>>({
-    ...storeStatusRef.current,
-    model: undefined,
+  const [[intent, info], set, store] = useStore<StoredIntent<I, O>>({
+    ...storeInfoRef.current,
     from: undefined,
     value: { isWorking: false },
   });
@@ -29,7 +27,7 @@ export const useIntent = <Input extends UnknownInput, O, I extends Inferred<Inpu
   const resolve = useCallback(
     (result: { i: I; o: O }) => {
       if (!nextRef.current) return;
-      nextRef.current(result).forEach((next) => next(store));
+      nextRef.current(result).forEach((next) => (next ? next(store) : undefined));
     },
     [store],
   );
@@ -47,11 +45,10 @@ export const useIntent = <Input extends UnknownInput, O, I extends Inferred<Inpu
       try {
         if (!toRef.current) throw new Error("no to provided");
         if (intent.value?.isWorking) return Promise.reject(new Error("already working")); // TODO: Add config to allow simultaneous requests
-        const parsedInput = modelRef.current?.(input) ?? input;
-        const toResult = toRef.current(parsedInput);
+        const toResult = toRef.current(input);
 
         if (isPromise(toResult)) {
-          // set status working
+          // set info working
           set({ isWorking: true, input });
           return toResult
             .then((o) => {
@@ -82,5 +79,5 @@ export const useIntent = <Input extends UnknownInput, O, I extends Inferred<Inpu
     [intent.value?.isWorking, set, resolve, reject],
   );
 
-  return { send, status, isWorking: intent.value?.isWorking ?? false };
+  return { send, info, isWorking: intent.value?.isWorking ?? false };
 };

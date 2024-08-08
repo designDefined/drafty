@@ -13,10 +13,15 @@ export const View =
   (...args: Parameters<typeof params>) => {
     const view = params(...args);
     const key = hashKeys(view.key);
-    const invalidate = (store: Store) => store.invalidateWith(key);
+    const invalidate = (store: Store) => store.invalidate(key);
+    const invalidateFilter = (store: Store) => store.invalidateFilter(key);
     const set = (setter: Setter<T> | Promise<Setter<T>>, config?: SetterConfig) => (store: Store) =>
-      store.setWith({ key, setter, config });
-    return { ...view, key, invalidate, set };
+      store.set({ key, setter, config });
+    const setFilter = (setter: Setter<T> | Promise<Setter<T>>, config?: SetterConfig) => (store: Store) =>
+      store.setFilter({ key, setter, config });
+    const clear = (store: Store) => store.clear(key);
+
+    return { ...view, key, invalidate, invalidateFilter, set, setFilter, clear };
   };
 
 export type View<T> = ReturnType<ReturnType<typeof View<T, unknown[]>>>;

@@ -45,6 +45,17 @@ const parseHype = (str: string): string =>
   unified().use(rehypeParse).use(rehypeSanitize).use(rehypeRemark).use(remarkStringify).processSync(str)
     .value as string;
 
+let count = 0;
+const fiveSecondPromise = () => {
+  console.log("start:", count);
+  count++;
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve(`count: ${count}`);
+    }, 5000);
+  });
+};
+
 export default function Home() {
   const quillRef = useRef<ReactQuill | null>(null);
 
@@ -53,9 +64,22 @@ export default function Home() {
     return unified().use(remarkParse).parse(value.md);
   }, [value.md]);
 
+  const promsRef = useRef<Promise<string> | null>(null);
+
   return (
     <Main>
-      <H2>가나다</H2>
+      <H2
+        onClick={() => {
+          if (!promsRef.current) {
+            promsRef.current = new Promise<string>(() => {});
+            promsRef.current.then((str) => console.log("DONE:", str));
+          } else {
+            fiveSecondPromise().then(() => {});
+          }
+        }}
+      >
+        가나다
+      </H2>
       <H1>Cycloid</H1>
       <Div spacing={[20]}>{sampleTree.children.map(transform)}</Div>
       <Div spacing={[20]}>

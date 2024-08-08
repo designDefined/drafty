@@ -22,7 +22,7 @@ export const useSimpleInput = <Input extends UnknownInput>({ key, input, from }:
   const hashedKey = useMemo(() => hashKeys(key), [key]);
   const inputRef = useRef(input);
   const fromRef = useRef(from);
-  const [[state], setInternal, , store] = useStore<GetTreeFromParserModel<Input>>({
+  const [[state], setInternal, store] = useStore<GetTreeFromParserModel<Input>>({
     key: "input_" + hashedKey,
     from: () => parseInitialTree(fromRef.current(), inputRef.current),
   });
