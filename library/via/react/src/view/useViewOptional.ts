@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { useStore } from "../store";
 import { View, ViewParams } from "@via/core";
+import { dropUndefinedKeys } from "library/via/core/src/util/optional";
 
 type UseViewParams<T> = { view: View<T> } & Omit<ViewParams<T>, "key">;
 
 export const useViewOptional = <T>({ view: { key, ...viewStatus }, ...overrideStatus }: UseViewParams<T>) => {
-  const [[view, status], set] = useStore<T>({ ...viewStatus, ...overrideStatus, key });
+  const [[view, status], set] = useStore<T>({ ...viewStatus, ...dropUndefinedKeys(overrideStatus), key });
 
   const update = useCallback(() => {
     const updater = overrideStatus.updater ?? viewStatus.updater;

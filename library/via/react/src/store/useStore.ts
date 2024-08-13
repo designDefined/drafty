@@ -46,5 +46,5 @@ export const useStore = <T>({ key, config, ...params }: UseStoreParams<T>): [Sto
     });
   }, [info.key]); // subscription depends nothing but the key
 
-  return [[values, info], set, store];
+  return [[values, info], set, store] as const;
 };

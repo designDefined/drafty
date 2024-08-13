@@ -21,7 +21,7 @@ export type SetterConfig = {
 
 export type StoredValues<T> = {
   value?: T;
-  promise?: Promise<Setter<T> | void>;
+  promise?: Promise<unknown>; // TODO: Refine promise type
   error?: unknown;
 };
 export type StoredInfo<T> = {
@@ -33,6 +33,7 @@ export type StoredInfo<T> = {
 export type Subscriber<T> = {
   onNext: (next: [StoredValues<T>, StoredInfo<T>]) => void;
   slice?: (whole: T) => DeepPartial<T>;
+  temporal?: boolean; // TODO: Clean-up temporal subscribers
 };
 
 // Config
@@ -62,7 +63,7 @@ type _UpdateAsyncParams<T> = {
   config?: SetterConfig;
 };
 type _RefreshParams<T> = {
-  key: Key;
+  stored: Stored<T>;
   from?: From<T>; // to override stored from
 };
 type _CheckParams<T> = {
@@ -91,11 +92,10 @@ export const createStore = (config: StoreConfig) => {
     const created: Stored<T> = {
       values: { value, promise, error },
       info: { key, ...info },
-      subscribers: new Map<Key, Subscriber<T>>(),
+      subscribers: new Map(),
       updatedAt: 0,
       gcTimer: null,
     };
-
     store.set(key, created);
     return created;
   };
@@ -162,20 +162,13 @@ export const createStore = (config: StoreConfig) => {
     });
   };
 
-  const _refresh = <T>({ key, from: fromOverride }: _RefreshParams<T>) => {
-    const stored = _read<T>({ key });
-    if (!stored) return;
-    if (stored.values.promise) return;
-
+  const _refresh = <T>({ stored, from: fromOverride }: _RefreshParams<T>) => {
     const from = fromOverride ?? stored.info.from;
     if (!from) throw new Error("No fetcher found");
 
     const setter = from();
-    if (isPromise(setter)) {
-      _updateAsync({ key: key, promise: setter, config: { override: true } });
-    } else {
-      _update({ key, setter, config: { override: true } });
-    }
+    if (isPromise(setter)) _updateAsync({ key: stored.info.key, promise: setter, config: { override: true } });
+    else _update({ key: stored.info.key, setter, config: { override: true } });
   };
 
   const _check = <T>({ stored, invalidated }: _CheckParams<T>) => {
@@ -185,13 +178,11 @@ export const createStore = (config: StoreConfig) => {
       // or stored is stale
       stored.updatedAt + (stored.info.staleTime ?? Infinity) < Date.now() ||
       invalidated
-    ) {
-      _refresh<T>({ key: stored.info.key });
-    }
+    )
+      _refresh<T>({ stored });
   };
 
   // public
-
   const get = <T>({ key, ...rest }: GetParams<T>) => {
     const read = _read<T>({ key });
     const stored = read ?? _create({ key, ...rest });
@@ -209,9 +200,8 @@ export const createStore = (config: StoreConfig) => {
 
   const subscribe = <T>({ key, subscriptionKey, subscriber }: SubscribeParams<T>) => {
     const stored = _read<T>({ key });
-    if (!stored) {
-      throw new Error("No stored found");
-    } // TODO: Error handling
+    if (!stored) throw new Error("No stored found");
+    // TODO: Error handling
 
     // add subscription
     stored.subscribers.set(subscriptionKey, subscriber);
@@ -225,11 +215,9 @@ export const createStore = (config: StoreConfig) => {
   const clear = (key: Key) => {
     const stored = _read({ key });
     if (!stored) return;
-    stored.values = {};
+    const newValues = { value: undefined, promise: undefined, error: undefined };
     stored.updatedAt = 0;
-    stored.subscribers.forEach((cb) => {
-      cb.onNext([stored.values, stored.info]);
-    });
+    stored.subscribers.forEach((cb) => cb.onNext([newValues, stored.info]));
   };
 
   const invalidate = (key: Key) => {
@@ -286,4 +274,4 @@ export const createStore = (config: StoreConfig) => {
 };
 
 export type Store = ReturnType<typeof createStore>;
-export type StoreNext = Pick<Store, "set" | "invalidate">;
+export type Next = (store: Store) => void;

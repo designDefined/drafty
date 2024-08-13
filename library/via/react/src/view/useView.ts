@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { useStore } from "../store";
 import { View, ViewParams } from "@via/core";
+import { dropUndefinedKeys } from "library/via/core/src/util/optional";
 
 type UseViewParams<T> = { view: View<T> } & Omit<ViewParams<T>, "key">;
 
 export const useView = <T>({ view: { key, ...viewStatus }, ...overrideStatus }: UseViewParams<T>) => {
-  const [[view, status], set] = useStore<T>({ ...viewStatus, ...overrideStatus, key });
+  const [[view, status], set] = useStore<T>({ ...viewStatus, ...dropUndefinedKeys(overrideStatus), key });
 
   const update = useCallback(() => {
     const updater = overrideStatus.updater ?? viewStatus.updater;
@@ -15,14 +16,7 @@ export const useView = <T>({ view: { key, ...viewStatus }, ...overrideStatus }: 
   }, [set, overrideStatus.updater, viewStatus.updater, view.value]);
 
   if (!view.value) {
-    /**
-     * Manually subscribe to store1
-     * because throwing promise or error prevents `useEffect` inside `useStore` from running.
-     */
     if (view.promise) throw view.promise;
-
-    console.log(key);
-    console.log("error throw");
     throw view.error ?? new Error("unknown error from useView"); // TODO: Handle error
   }
 
@@ -30,6 +24,7 @@ export const useView = <T>({ view: { key, ...viewStatus }, ...overrideStatus }: 
     value: view.value,
     error: view.error,
     promise: view.promise,
+    isUpdating: !!view.promise,
     status,
     update,
   };
