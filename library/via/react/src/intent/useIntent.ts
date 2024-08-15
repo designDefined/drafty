@@ -27,16 +27,16 @@ export const useIntent = <P extends ParserTree<unknown>, O>({
 
   const resolve = useCallback(
     (result: { i: Inferred<P>; o: O }) => {
-      if (!nextMemo) return;
-      nextMemo(result).forEach((next) => (next ? next(store) : undefined));
+      if (!nextMemo) return Promise.resolve();
+      return Promise.all(nextMemo(result).map((next) => (next ? next(store) : Promise.resolve())));
     },
     [store, nextMemo],
   );
 
   const reject = useCallback(
     (result: { i: Inferred<P>; error: unknown }) => {
-      if (!catchMemo) return;
-      catchMemo(result).forEach((_catch) => (_catch ? _catch(store) : undefined));
+      if (!catchMemo) return Promise.resolve();
+      return Promise.all(catchMemo(result).map((_catch) => (_catch ? _catch(store) : Promise.resolve())));
     },
     [store, catchMemo],
   );
@@ -54,18 +54,18 @@ export const useIntent = <P extends ParserTree<unknown>, O>({
           // set info working
           set({ isWorking: true });
           return toResult
-            .then((output) => {
+            .then(async (output) => {
               // resolve asyncronous request
               const validOutput = modelRef.current.o ? modelRef.current.o(output) : output;
+              await resolve({ i: input?.[0] as Inferred<P>, o: validOutput });
               set({ isWorking: false, lastInput: input?.[0] as Inferred<P>, lastOutput: validOutput });
-              resolve({ i: input?.[0] as Inferred<P>, o: validOutput }); // TODO: Do we need to await next/catch?
               return validOutput;
             })
-            .catch((e) => {
+            .catch(async (e) => {
               // reject asyncronous request
-              console.error("Asyncronous send rejected"); // TODO: Change temporal debug message
+              await reject({ i: input?.[0] as Inferred<P>, error: e });
               set({ isWorking: false }, { error: e });
-              reject({ i: input?.[0] as Inferred<P>, error: e });
+              console.error("Asyncronous send rejected"); // TODO: Change temporal debug message
               return Promise.reject(e);
             });
         } else {

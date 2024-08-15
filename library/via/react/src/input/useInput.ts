@@ -1,67 +1,82 @@
 import {
-  extractFromInputState,
-  InferredPartial,
-  initializeInputStateFromParser,
-  InputStateTree,
-  InputValueTree,
-  mergePartialValueWithInputState,
+  initiateParser,
+  InputSetter,
   ParserTree,
+  stateFromParserTree,
+  StateTree,
+  StoredInput,
+  update,
+  valueFromState,
+  ValueTree,
+  isStateModified,
+  isStateValid,
+  InferredInitial,
+  UpdateConfig,
 } from "@via/core";
 import { useCallback, useEffect, useMemo } from "react";
 import { useStore } from "../store";
-import { produce } from "immer";
-
-export type InputSetterPartial<P extends ParserTree<unknown>> = InferredPartial<P>;
-export type InputSetterFn<P extends ParserTree<unknown>> = (draft: InferredPartial<P>) => void;
-export type InputSetter<P extends ParserTree<unknown>> = InputSetterPartial<P> | InputSetterFn<P>;
-
-const isInputSetterFn = <P extends ParserTree<unknown>>(setter: InputSetter<P>): setter is InputSetterFn<P> =>
-  typeof setter === "function";
 
 type UseInputParams<P extends ParserTree<unknown>> = {
   key: string;
   parser: P;
-  initiate?: { value: InferredPartial<P>; set?: boolean };
+  initialSetter?: InputSetter<P>;
 };
 
 export const useInput = <P extends ParserTree<unknown>>({
   key,
   parser,
-  initiate,
+  initialSetter,
 }: UseInputParams<P>): {
-  set: (setter: InputSetter<P>) => void;
+  set: (setter: InputSetter<P>, config?: UpdateConfig) => void;
   reset: () => void;
-  value: InputValueTree<P>;
-  currentInput: InferredPartial<P>;
-  state: InputStateTree<P>;
+  value: ValueTree<P>;
+  current: InferredInitial<P>;
+  currentInput: InferredInitial<P>;
+  state: StateTree<P>;
   errors: unknown[];
   isEmpty: boolean;
+  isValid: boolean;
 } => {
-  const initialState = useMemo(() => initializeInputStateFromParser(parser), [key]);
+  const [[{ value: input }], setStored] = useStore<StoredInput<P>>({
+    key,
+    from: () => {
+      const state = stateFromParserTree(parser);
+      const current = initiateParser(parser);
+      return { parser, state, current };
+    },
+  });
 
-  const [[{ value: inputState }], setInputState] = useStore<InputStateTree<P>>({ key, from: () => initialState });
-
-  const { inputValue, current, errors, isEmpty } = useMemo(() => {
-    return extractFromInputState(inputState ?? initialState);
-  }, [inputState, initialState]);
+  if (!input) throw new Error("Input not found");
 
   const set = useCallback(
-    (setter: InputSetter<P>) => {
-      if (!inputState) return;
-      const partial = isInputSetterFn(setter) ? produce(current, setter) : setter;
-      setInputState(mergePartialValueWithInputState(inputState, partial));
-    },
-    [current, inputState, setInputState],
+    (setter: InputSetter<P>, config?: UpdateConfig) => setStored(update(input, setter, config), { override: true }),
+    [input, setStored],
   );
 
   const reset = useCallback(() => {
-    setInputState(initialState, { override: true });
-    if (initiate?.set) set(initiate.value);
-  }, [initiate, set, setInputState, initialState]);
+    const state = stateFromParserTree(parser);
+    const current = initiateParser(parser);
+    setStored({ parser, state, current }, { override: true });
+    if (initialSetter) set(initialSetter, { silent: true });
+  }, [parser, setStored, set, initialSetter]);
+
+  const value = useMemo(() => valueFromState(input.state), [input.state]);
+  const isEmpty = useMemo(() => !isStateModified(input.state), [input.state]);
+  const isValid = useMemo(() => isStateValid(input.state), [input.state]);
 
   useEffect(() => {
-    if (initiate?.set) set(initiate.value);
+    if (initialSetter) set(initialSetter, { silent: true });
   }, [key]);
 
-  return { state: inputState ?? initialState, value: inputValue, currentInput: current, isEmpty, errors, set, reset };
+  return {
+    state: input.state,
+    value,
+    current: input.current,
+    currentInput: input.current,
+    isEmpty,
+    isValid,
+    errors: [],
+    set,
+    reset,
+  };
 };

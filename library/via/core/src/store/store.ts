@@ -205,6 +205,7 @@ export const createStore = (config: StoreConfig) => {
 
     // add subscription
     stored.subscribers.set(subscriptionKey, subscriber);
+    subscriber.onNext([stored.values, stored.info]);
     return () => {
       stored.subscribers.delete(subscriptionKey);
       if (stored.subscribers.size < 1) store.delete(key);

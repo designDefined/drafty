@@ -1,7 +1,7 @@
+import { Inferred, Parser, ParserTree } from "../input";
 import { Next } from "../store";
 import { Falsy } from "../util/falsy";
 import { hashKeys, RawKey } from "../util/hashKey";
-import { Parser, ParserTree, Inferred } from "./input";
 
 export type ToArgs<I> = I extends void ? never[] : [I];
 export type To<I, O> = (...args: ToArgs<I>) => O | Promise<O>;

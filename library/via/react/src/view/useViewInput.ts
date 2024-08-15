@@ -1,18 +1,18 @@
-import { InferredPartial, ParserTree, View } from "@via/core";
+import { InputSetter, ParserTree, View } from "@via/core";
 import { useInput } from "../input/useInput";
 
 type UseViewInputParams<P extends ParserTree<unknown>, O> = {
   view: View<O>;
   parser: P;
-  initiate?: { value: InferredPartial<P>; set?: boolean };
+  initialSetter?: InputSetter<P>;
 };
 
 export const useViewInput = <P extends ParserTree<unknown>, O>({
   view: { key },
   parser,
-  initiate,
+  initialSetter,
 }: UseViewInputParams<P, O>) => {
   if (!parser) throw new Error("no parser provided");
-  const input = useInput<P>({ key: "input" + key, parser, initiate });
+  const input = useInput<P>({ key: "input" + key, parser, initialSetter });
   return input;
 };
