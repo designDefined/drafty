@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Home from "../ui/home/Home";
-import FeConf from "../ui/feconf/FeConf";
+import FEConfHome from "../ui/feconf/page";
 
 export const router = createBrowserRouter([
   {
@@ -9,6 +9,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "/feconf-2024",
-    element: <FeConf />,
+    element: <FEConfHome />,
   },
 ]);

@@ -20,12 +20,14 @@ type UseInputParams<P extends ParserTree<unknown>> = {
   key: string;
   parser: P;
   initialSetter?: InputSetter<P>;
+  cacheTime?: number;
 };
 
 export const useInput = <P extends ParserTree<unknown>>({
   key,
   parser,
   initialSetter,
+  cacheTime,
 }: UseInputParams<P>): {
   set: (setter: InputSetter<P>, config?: UpdateConfig) => void;
   reset: () => void;
@@ -39,6 +41,7 @@ export const useInput = <P extends ParserTree<unknown>>({
 } => {
   const [[{ value: input }], setStored] = useStore<StoredInput<P>>({
     key,
+    cacheTime,
     from: () => {
       const state = stateFromParserTree(parser);
       const current = initiateParser(parser);

@@ -84,7 +84,7 @@ export const updateStateTree = <P extends ParserTree<unknown>>(
     const commonState = stateFromParserTree(prevState.parser);
     return {
       ...prevState,
-      value: (value as any[]).map((itemValue) => updateStateTree(commonState as any, itemValue, config)),
+      value: (value as any[]).map(itemValue => updateStateTree(commonState as any, itemValue, config)),
     };
   }
   return Object.keys(prevState).reduce((acc, key) => {

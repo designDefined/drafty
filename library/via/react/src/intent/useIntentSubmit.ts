@@ -6,31 +6,33 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 type UseIntentSubmitParams<P extends ParserTree<unknown>, O> = {
   intent: Intent<P, O>;
   initialSetter?: InputSetter<P>;
+  cacheTime?: number;
 } & Omit<IntentParams<P, O>, "key" | "input">;
 
 export const useIntentSubmit = <P extends ParserTree<unknown>, O>({
-  intent,
+  intent: { key, ...intent },
   initialSetter,
   ...params
 }: UseIntentSubmitParams<P, O>) => {
   const needReset = useRef(false);
-  const { send, isWorking } = useIntent<P, O>({ intent, ...params });
+  const { send, isWorking } = useIntent<P, O>({ intent: { ...intent, key }, ...params });
   const { value, current, currentInput, isEmpty, errors, state, set, reset } = useIntentInput<P, O>({
-    intent,
+    intent: { ...intent, key },
     initialSetter,
+    cacheTime: params.cacheTime ?? intent.cacheTime,
   });
 
   const isValid = useMemo(() => {
     return errors.length === 0 && !isEmpty;
-  }, [errors, isEmpty]);
+  }, [key, errors, isEmpty]);
 
   const submit = useCallback(() => {
     if (!isValid) return Promise.reject(errors[0]); // TODO: Merge error
-    return send(...([currentInput] as ToArgs<Inferred<P>>)).then((output) => {
+    return send(...([currentInput] as ToArgs<Inferred<P>>)).then(output => {
       needReset.current = true; // Do not reset immmediately.
       return output;
     });
-  }, [currentInput, errors, isValid, send]);
+  }, [key, currentInput, errors, isValid, send]);
 
   // Reset at the next render after the submission.
   useEffect(() => {

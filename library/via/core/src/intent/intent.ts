@@ -13,6 +13,7 @@ export type IntentParams<P extends ParserTree<unknown>, O> = {
   next?: (result: { i: Inferred<P>; o: O }) => (Next | Falsy)[];
   catch?: (result: { i: Inferred<P>; error: unknown }) => (Next | Falsy)[];
   model?: { i?: Parser<Inferred<P>>; o?: Parser<O> };
+  cacheTime?: number;
 };
 
 export type StoredIntent<I, O> = {
