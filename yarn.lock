@@ -1269,7 +1269,10 @@ __metadata:
   dependencies:
     "@types/deepmerge": "npm:^2.2.0"
     "@types/lodash": "npm:^4.17.6"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    "@typescript-eslint/parser": "npm:^7.2.0"
     deepmerge: "npm:^4.3.1"
+    eslint: "npm:^8.57.0"
     immer: "npm:^10.1.1"
     lodash: "npm:^4.17.21"
     nanoid: "npm:^5.0.7"
