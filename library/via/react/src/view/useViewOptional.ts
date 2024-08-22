@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import { useStore } from "../store";
-import { View, ViewParams } from "@via/core";
-import { dropUndefinedKeys } from "library/via/core/src/util/optional";
+import { View, ViewParams, dropUndefinedKeys } from "@via/core";
 
 type UseViewParams<T> = { view: View<T> } & Omit<ViewParams<T>, "key">;
 

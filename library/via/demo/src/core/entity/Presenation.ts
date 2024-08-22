@@ -6,3 +6,8 @@ export type Presentation = {
   title: string;
   children: Block[];
 };
+
+export type PresentationSummary = {
+  id: ID;
+  title: string;
+};

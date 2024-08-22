@@ -1,5 +1,5 @@
 import { ID } from "./common/id";
-import { Font, Layout } from "./common/style";
+import { Font, Layout, Material } from "./common/style";
 import { Type } from "./common/type";
 
 export type Paragraph = {
@@ -8,6 +8,7 @@ export type Paragraph = {
   content: string;
   style?: {
     layout?: Layout;
+    material?: Material;
     font?: Font;
     align?: "left" | "center" | "right" | "justify";
   };

@@ -1,4 +1,4 @@
-import { Key, SetterWhole } from "library/via/core";
+import { Key, SetterWhole } from "@via/core";
 import { useStoreContext } from "./useStoreContext";
 import { useCallback } from "react";
 

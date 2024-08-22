@@ -1,4 +1,4 @@
-import { FluidStyle } from "library/fluid/package/core";
+import { FluidStyle } from "@fluid/core";
 
 export type Layout = FluidStyle;
 
@@ -16,3 +16,5 @@ export type Material = {
   border?: { color?: string; width?: number; radius?: number };
   background?: { color?: string };
 };
+
+export type Preset = string[];
