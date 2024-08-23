@@ -4,7 +4,7 @@ export type SelectionState =
   | { type: "ranged"; start: InlinePosition; end: InlinePosition }
   | { type: "collapsed"; start: InlinePosition };
 
-export type KeyState =
+export type KeyState = { consume?: boolean } & (
   | { type: "idle" }
   | { type: "write"; isComposing: boolean }
   | { type: "delete" }
@@ -12,7 +12,8 @@ export type KeyState =
   | { type: "copy" }
   | { type: "paste" }
   | { type: "cut" }
-  | { type: "format"; key: "b" | "i" };
+  | { type: "format"; key: "b" | "i" }
+);
 
 export type States = {
   selectionBeforeInput: SelectionState | null;

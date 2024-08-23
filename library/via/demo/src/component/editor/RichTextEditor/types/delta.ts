@@ -14,4 +14,9 @@ export type Delta =
       type: "breakLine";
       start: InlinePosition;
       end: InlinePosition;
+    }
+  | {
+      type: "deleteText";
+      start: InlinePosition;
+      end: InlinePosition;
     };

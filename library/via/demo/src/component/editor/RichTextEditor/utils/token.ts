@@ -1,13 +1,13 @@
 import { BlockToken, InlineToken, Root } from "../types/ast";
-import { BlockPosition, InlinePosition } from "../types/position";
+import { InlinePosition, Position } from "../types/position";
 
 // create
-export const createInlineToken = (root: Root): InlineToken => {
+export const createInlineToken = (root: Root, value?: string): InlineToken => {
   root.lastInlineId++;
   return {
     id: root.lastInlineId,
     format: [],
-    value: "",
+    value: value ?? "",
   };
 };
 
@@ -16,7 +16,7 @@ export const createBlockToken = (root: Root): BlockToken => {
   return {
     id: root.lastBlockId,
     format: [],
-    children: [createInlineToken(root)],
+    children: [],
   };
 };
 
@@ -29,21 +29,66 @@ export const findInlineFromRoot = (root: Root, position: InlinePosition) => {
   return inline;
 };
 
-export const findBlockFromRoot = (root: Root, position: BlockPosition) => {
+export const findBlockFromRoot = (root: Root, position: Position) => {
   const block = root.children.find(b => b.id === position.blockId);
   if (!block) throw new Error("Invalid block");
   return block;
 };
 
-export const insertBlockAfter = (root: Root, position: BlockPosition): InlinePosition => {
+// insert
+export const insertInlineAfter = (root: Root, position: Position, textContent?: string): InlinePosition => {
   const block = findBlockFromRoot(root, position);
-  const index = root.children.indexOf(block);
-  const newBlock: BlockToken = createBlockToken(root);
-  root.children.splice(index + 1, 0, newBlock);
-  return { blockId: newBlock.id, inlineId: newBlock.children[0].id, offset: 0, textContent: "" };
+  if (position.type === "block") {
+    const newInline = createInlineToken(root, textContent);
+    block.children.push(newInline);
+    return {
+      type: "inline",
+      blockId: position.blockId,
+      inlineId: newInline.id,
+      offset: textContent?.length ?? 0,
+      textContent: textContent ?? "",
+    };
+  }
+  const index = block.children.findIndex(({ id }) => id === position.inlineId);
+  const newInline = createInlineToken(root, textContent);
+  block.children.splice(index + 1, 0, newInline);
+  return {
+    type: "inline",
+    blockId: position.blockId,
+    inlineId: newInline.id,
+    offset: textContent?.length ?? 0,
+    textContent: textContent ?? "",
+  };
 };
 
-export const concatNextBlock = (root: Root, position: BlockPosition) => {
+export const insertBlockAfter = (root: Root, blockId: number): InlinePosition => {
+  // if (blockId === undefined) {
+  //   const newBlock = createBlockToken(root);
+  //   const newInline = createInlineToken(root);
+  //   newBlock.children.push(newInline);
+  //   root.children.push(newBlock);
+  //   return {
+  //     type: "inline",
+  //     blockId: newBlock.id,
+  //     inlineId: newBlock.children[0].id,
+  //     offset: 0,
+  //     textContent: "",
+  //   };
+  // }
+  const block = root.children.find(b => b.id === blockId);
+  if (!block) throw new Error("Invalid block");
+
+  const index = root.children.indexOf(block);
+  const newBlock: BlockToken = createBlockToken(root);
+  const newInline = createInlineToken(root);
+
+  newBlock.children.push(newInline);
+  root.children.splice(index + 1, 0, newBlock);
+  return { type: "inline", blockId: newBlock.id, inlineId: newInline.id, offset: 0, textContent: "" };
+};
+
+// concat
+export const concatNextBlock = (root: Root, position: InlinePosition) => {
   const block = findBlockFromRoot(root, position);
   const index = root.children.indexOf(block);
   const nextBlock = root.children[index + 1];
@@ -52,6 +97,7 @@ export const concatNextBlock = (root: Root, position: BlockPosition) => {
   root.children.splice(index + 1, 1);
 };
 
+// splice
 export const spliceTokens = (root: Root, from: InlinePosition, to: InlinePosition): boolean => {
   if (from.blockId === to.blockId && from.inlineId === to.inlineId) {
     const target = findInlineFromRoot(root, from);
@@ -62,7 +108,7 @@ export const spliceTokens = (root: Root, from: InlinePosition, to: InlinePositio
     const blockTarget = findBlockFromRoot(root, from);
     const startIndex = blockTarget.children.findIndex(({ id }) => id === from.inlineId);
     const endIndex = blockTarget.children.findIndex(({ id }) => id === to.inlineId);
-    blockTarget.children.splice(startIndex + 1, endIndex - startIndex);
+    blockTarget.children.splice(startIndex + 1, endIndex - startIndex - 1);
 
     const inlineStartTarget = findInlineFromRoot(root, from);
     inlineStartTarget.value = inlineStartTarget.value.slice(0, from.offset);

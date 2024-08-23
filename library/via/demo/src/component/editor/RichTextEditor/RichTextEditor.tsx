@@ -1,12 +1,15 @@
 import styles from "./styles/styles.module.css";
 import { Div, FluidStyle, H6 } from "@fluid/core";
-import { CSSProperties, ReactNode, RefObject, useEffect, useReducer, useRef } from "react";
+import { CSSProperties, ReactNode, RefObject, useCallback, useEffect, useReducer, useRef } from "react";
 import { initialStates, States } from "./types/state";
-import { toDelta, toKeyState, toSelectionState, transformAst } from "./parse";
 import { AstTransformResult, initialRoot, Root } from "./types/ast";
 import { fromRoot } from "./reactify";
 import { stringifyId } from "./utils/id";
 import { InlinePosition } from "./types/position";
+import { transformAst } from "./parse/ast";
+import { toDelta } from "./parse/delta";
+import { toKeyState } from "./parse/key";
+import { toSelectionState } from "./parse/selection";
 
 type RichTextEditorProps = {
   value: string;
@@ -47,12 +50,21 @@ export default function RichTextEditor({ className, fluid, style }: RichTextEdit
     contents: fromRoot(root.current, idPrefix.current),
   }));
 
+  const updateRoot = useCallback(() => {
+    const delta = toDelta(states.current);
+    const result = transformAst(root.current, delta);
+    dispatchResult({ ...result });
+
+    // clear states
+    states.current.selectionBeforeInput = null;
+    states.current.key = null;
+    states.current.selectionAfterInput = null;
+  }, []);
+
   useEffect(() => {
     if (!editorRef.current || !caretPosition) return;
 
     const range = document.createRange();
-
-    console.log(caretPosition);
 
     const startInlineId = stringifyId(caretPosition.start.inlineId, true, idPrefix.current);
     const startInlineTarget = editorRef.current.querySelector("#" + startInlineId);
@@ -90,13 +102,14 @@ export default function RichTextEditor({ className, fluid, style }: RichTextEdit
         contentEditable
         suppressContentEditableWarning
         onKeyDown={e => {
-          states.current.key = toKeyState(e);
           states.current.selectionBeforeInput = toSelectionState(window.getSelection());
+          states.current.key = toKeyState(e, states.current.selectionBeforeInput);
+          if (states.current.key.consume) updateRoot();
         }}
         onInput={() => {
+          if (!states.current.selectionBeforeInput || !states.current.key) return;
           states.current.selectionAfterInput = toSelectionState(window.getSelection());
-          const result = transformAst(root.current, toDelta(states.current));
-          dispatchResult({ ...result });
+          updateRoot();
         }}
       >
         {contents}
