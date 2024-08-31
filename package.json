@@ -5,6 +5,7 @@
   "scripts": {
     "dialog": "yarn workspace @project/dialog",
     "mock": "yarn workspace mock",
+    "plate-breaker": "yarn workspace plate-breaker",
     "initialize-db": "yarn mock initialize",
     "lib:fluid": "yarn workspace fluid"
   },

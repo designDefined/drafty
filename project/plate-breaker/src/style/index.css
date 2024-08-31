@@ -1,0 +1,39 @@
+@import "./reset.css";
+
+body {
+  font-family: sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+}
+
+p {
+  white-space: pre-wrap;
+  border: 1px solid black;
+  border-radius: 4px;
+}
+
+h5 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+input {
+  border: 1px solid black;
+}
+
+button {
+  align-self: flex-start;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid black;
+  transition: 0.2s ease;
+}
+button.hover {
+  background-color: #f5f5f5;
+}
+button:disabled {
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+  color: #c0c0c0;
+  border: none;
+}

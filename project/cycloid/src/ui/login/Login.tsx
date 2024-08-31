@@ -1,6 +1,7 @@
+import { useIntentSubmit } from "@via/react";
+
 import { useNavigate } from "react-router-dom";
 import { Button, Div, H2, H5, Input, Main } from "@fluid/core";
-import { useIntentSubmit } from "library/via/react";
 
 import { LoginIntent } from "@/core/intent/user/login";
 
@@ -21,8 +22,8 @@ export default function Login() {
         <Input
           type="text"
           value={name.value}
-          onChange={(e) =>
-            set((i) => {
+          onChange={e =>
+            set(i => {
               i.name.value = e.target.value;
             })
           }

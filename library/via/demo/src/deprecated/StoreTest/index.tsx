@@ -1,4 +1,4 @@
-// import { useStore } from "@via/react";
+// import { useStore } from "viajs-react";
 // import { useEffect, useState } from "react";
 // import { Div, Span } from "@fluid/core";
 // import { Button } from "@fluid/minimal";

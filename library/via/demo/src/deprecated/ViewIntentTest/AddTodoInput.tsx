@@ -1,4 +1,4 @@
-// import { useIntentInput } from "@via/react";
+// import { useIntentInput } from "viajs-react";
 // import { AddTodoIntent } from "../../core/intent/addTodo";
 
 // export default function AddTodoInput() {

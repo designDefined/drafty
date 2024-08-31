@@ -1,4 +1,4 @@
-import { Div, Main, H1 } from "@fluid/core";
+import { Div, H1, Main } from "@fluid/core";
 
 export default function New() {
   return (

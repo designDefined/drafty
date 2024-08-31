@@ -1,6 +1,6 @@
 import { ReactNode, useMemo, useRef, useState } from "react";
 import ReactQuill from "react-quill";
-import { Div, H1, H2, Main } from "@fluid/core";
+import { Div, H1, H2, Main } from "@flexive/core";
 import { RootContent } from "mdast";
 import rehypeParse from "node_modules/rehype-parse/lib";
 import remarkStringify from "node_modules/remark-stringify/lib";
@@ -49,7 +49,7 @@ let count = 0;
 const fiveSecondPromise = () => {
   console.log("start:", count);
   count++;
-  return new Promise<string>((resolve) => {
+  return new Promise<string>(resolve => {
     setTimeout(() => {
       resolve(`count: ${count}`);
     }, 5000);
@@ -72,7 +72,7 @@ export default function Home() {
         onClick={() => {
           if (!promsRef.current) {
             promsRef.current = new Promise<string>(() => {});
-            promsRef.current.then((str) => console.log("DONE:", str));
+            promsRef.current.then(str => console.log("DONE:", str));
           } else {
             fiveSecondPromise().then(() => {});
           }
@@ -81,9 +81,9 @@ export default function Home() {
         가나다
       </H2>
       <H1>Cycloid</H1>
-      <Div spacing={[20]}>{sampleTree.children.map(transform)}</Div>
-      <Div spacing={[20]}>
-        <Div flow={["row"]}>
+      <Div f={{ spacing: [20] }}>{sampleTree.children.map(transform)}</Div>
+      <Div f={{ spacing: [20] }}>
+        <Div f={{ flow: ["row"] }}>
           <button>get</button>
           <button
             onClick={() => {
@@ -118,7 +118,7 @@ export default function Home() {
           value={value.hype}
           modules={{ toolbar: false }}
           formats={["bold", "code-block"]}
-          onChange={(hype) => {
+          onChange={hype => {
             const md = parseHype(hype);
             console.log(md);
             setValue({ hype, md });

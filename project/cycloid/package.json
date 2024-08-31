@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@flexive/core": "^0.0.1",
     "@fluid/core": "workspace:^",
     "@fluid/minimal": "workspace:^",
     "@via/core": "workspace:^",

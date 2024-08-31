@@ -1,4 +1,4 @@
-import { View } from "@via/core";
+import { View } from "viajs-core";
 import { PresentationSummary } from "../entity/Presenation";
 import { PresentationRepository } from "../repository/presentation";
 import { Block } from "../entity/Block";
