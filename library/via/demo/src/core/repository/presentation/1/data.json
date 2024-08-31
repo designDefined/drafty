@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "type": "BLOCK",
+    "name": "Sample Title",
+    "style": { "layout": { "justify": ["start", "auto", "100vh"], "spacing": [40, 8] } },
+    "children": [
+      {
+        "id": 2,
+        "type": "PARAGRAPH",
+        "content": "Hello World",
+        "style": {
+          "layout": { "spacing": [20] },
+          "material": { "border": { "color": "black", "width": 1, "radius": 16 } }
+        }
+      }
+    ]
+  }
+]

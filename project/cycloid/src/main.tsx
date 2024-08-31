@@ -1,11 +1,14 @@
-import "./style/index.css";
-import ReactDOM from "react-dom/client";
-import { Via } from "@via/react";
 import { createStore } from "@via/core";
+import { Via } from "@via/react";
+
+import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
+
 import { router } from "./router/index.tsx";
 
-const store = createStore();
+import "./style/index.css";
+
+const store = createStore({ debug: { lens: [] } });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Via store={store}>

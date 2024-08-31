@@ -1,56 +1,88 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { produce } from "immer";
 import { Key } from "../util/hashKey";
 import { isPromise } from "../util/promise";
 import { DeepPartial } from "../util/deep";
-import merge from "lodash/merge";
-import cloneDeep from "lodash/cloneDeep";
+import { deepMerge } from "../util/merge";
 
-// Types
-export type Model<T> = (input: unknown) => T;
+/*
+ * Stored Info
+ */
+
+/**
+ * Provides intial value of stored item.
+ */
 export type From<T> = () => T | Promise<T>;
-export type Setter<T> = T | DeepPartial<T> | ((draft: T) => void);
+
+/**
+ * Information of stored item. The reference of `StoredInfo` remains same throughout the lifetime of each items.
+ */
+export type StoredInfo<T> = {
+  key: Key;
+  from?: From<T>;
+  staleTime?: number;
+  cacheTime?: number;
+};
+
+/*
+ * Setter
+ */
+export type SetterWhole<T> = T;
+export type SetterPartial<T> = DeepPartial<T>;
+export type SetterFn<T> = (draft: T) => void;
+export type Setter<T> = SetterWhole<T> | SetterPartial<T> | SetterFn<T>;
 export type SetterConfig = {
   override?: boolean;
   clearPromise?: boolean;
   error?: unknown;
 };
 
+/*
+ * Stored Values
+ */
+
+/**
+ * The current value fo stored item.
+ * If `value` exists, the item is currently available. If not, status of the item depends on whether `promise` or `error` exists.
+ * The reference changes on every `set`.
+ */
 export type StoredValues<T> = {
   value?: T;
-  promise?: Promise<Setter<T> | void>;
+  promise?: Promise<unknown>; // TODO: Refine promise type
   error?: unknown;
 };
-export type StoredStatus<T> = {
-  key: string;
-  model?: Model<T>;
-  from?: From<T>;
-  staleTime?: number;
-  gcTime?: number;
-};
-export type Subscriber<T> = {
-  fn: (next: [StoredValues<T>, StoredStatus<T>]) => void;
-  isTemporary?: boolean;
-};
 
-// Config
-export type StoreConfig = {};
+/*
+ * Subscriber
+ */
+export type Subscriber<T> = { next: (stored: [StoredValues<T>, StoredInfo<T>]) => void };
 
-// API
+/*
+ * Stored
+ */
 export type Stored<T> = {
   values: StoredValues<T>;
-  status: StoredStatus<T>;
+  info: StoredInfo<T>;
   subscribers: Map<Key, Subscriber<T>>;
-  updatedAt: number;
-  gcTimer: number | null;
+  updatedAt: number; // -1 for never updated or invalidated item
+  gcTimer: ReturnType<typeof setTimeout> | null;
 };
 
-type _CreateParams<T> = StoredStatus<T> & { value?: T };
-type _ReadParams = {
-  key: Key;
+/*
+ * API
+ */
+
+// Manipulator
+type _ManipulatorParams<T> = {
+  stored: Stored<T>;
 };
+
+// CRUD
+type _CreateParams<T> = StoredInfo<T> & StoredValues<T>;
+type _ReadParams = { key: Key };
 type _UpdateParams<T> = {
   key: Key;
-  setter: Setter<T>;
+  setter: Setter<T> | undefined;
   config?: SetterConfig;
 };
 type _UpdateAsyncParams<T> = {
@@ -58,12 +90,8 @@ type _UpdateAsyncParams<T> = {
   promise: Promise<Setter<T>>;
   config?: SetterConfig;
 };
-type _RefreshParams<T> = {
+type _DeleteParams = {
   key: Key;
-  from?: From<T>; // to override stored from
-};
-type _CheckParams<T> = {
-  stored: Stored<T>;
 };
 
 export type GetParams<T> = _CreateParams<T>;
@@ -76,22 +104,55 @@ export type SubscribeParams<T> = {
   key: Key;
   subscriptionKey: Key;
   subscriber: Subscriber<T>;
-  isTemporary?: boolean;
-};
+} & Omit<GetParams<T>, "key">;
 
 export const createStore = () => {
   const store = new Map<Key, Stored<any>>();
 
-  // private
-  const _create = <T>({ key, value, ...rest }: _CreateParams<T>) => {
+  // private method starts with underscore
+
+  // Manipulator
+  const _resolve = <T>({ stored }: _ManipulatorParams<T>) => {
+    stored.subscribers.forEach(({ next }) => {
+      next([stored.values, stored.info]);
+    });
+  };
+
+  const _cache = <T>({ stored }: _ManipulatorParams<T>) => {
+    const time = stored.info.cacheTime ?? 0;
+    const timeout = setTimeout(() => {
+      store.delete(stored.info.key);
+    }, time);
+    stored.gcTimer = timeout;
+  };
+
+  const _reset = <T>({ stored }: _ManipulatorParams<T>) => {
+    if (!stored.info.from) throw new Error("No from found");
+    const setter = stored.info.from();
+    if (isPromise(setter)) _updateAsync({ key: stored.info.key, promise: setter, config: { override: true } });
+    else _update({ key: stored.info.key, setter, config: { override: true } });
+  };
+
+  const _check = <T>({ stored }: _ManipulatorParams<T>) => {
+    if (
+      // refresh if values are totally empty
+      (stored.values.value === undefined && stored.values.promise === undefined && stored.values.error === undefined) ||
+      // or stored is stale
+      stored.updatedAt < 0 ||
+      stored.updatedAt + (stored.info.staleTime ?? Infinity) < Date.now()
+    )
+      _reset<T>({ stored });
+  };
+
+  // CRUD
+  const _create = <T>({ key, value, promise, error, ...info }: _CreateParams<T>) => {
     const created: Stored<T> = {
-      values: { value },
-      status: { key, ...rest },
-      subscribers: new Map<Key, Subscriber<T>>(),
-      updatedAt: 0,
+      values: { value, promise, error },
+      info: { key, ...info },
+      subscribers: new Map(),
+      updatedAt: value === undefined ? -1 : Date.now(),
       gcTimer: null,
     };
-
     store.set(key, created);
     return created;
   };
@@ -101,86 +162,59 @@ export const createStore = () => {
   };
 
   const _update = <T>({ key, setter, config }: _UpdateParams<T>) => {
+    // read stored
     const stored = _read<T>({ key });
-    if (!stored) return;
 
-    const { values, status } = stored;
+    // add stored if it doesn't exist and request is overridable
+    if (!stored) {
+      if (!config?.override) return;
+      _create({ key, value: setter, ...config });
+      return;
+    }
+
+    // update stored
     let newValues: StoredValues<T>;
 
-    if (config?.override && typeof setter !== "function")
-      newValues = { ...values, value: setter as T };
-    else if (!values.value) {
-      newValues = {};
-    } else if (typeof setter === "function")
-      newValues = {
-        ...values,
-        value: produce(values.value, setter as (draft: T) => void),
-      };
-    else
-      newValues = {
-        ...values,
-        value: merge(cloneDeep(values.value), setter),
-      };
+    // replace existing value with setter if override
+    if (config?.override) newValues = { ...stored.values, value: setter as T };
+    // prevent partial merge if value is empty
+    else if (stored.values.value === undefined) newValues = stored.values; // TODO: Is this okay?
+    // merge with immer
+    else if (typeof setter === "function")
+      newValues = { ...stored.values, value: produce(stored.values.value, setter as (draft: T) => void) };
+    // merge with deepMerge
+    else newValues = { ...stored.values, value: deepMerge(stored.values.value, setter) };
 
     if (config?.clearPromise) newValues.promise = undefined;
     if (config?.error) newValues.error = config.error;
     stored.values = newValues;
     stored.updatedAt = Date.now();
-    stored.subscribers.forEach((cb) => {
-      cb.fn([newValues, status]);
-    });
+    _resolve({ stored });
   };
 
   const _updateAsync = <T>({ key, promise, config }: _UpdateAsyncParams<T>) => {
     const stored = _read<T>({ key });
     if (!stored) return;
+    if (stored.values.promise) return;
 
     promise
       .then((setter) => {
         _update({ key, setter, config: { ...config, clearPromise: true } });
       })
       .catch((e) => {
-        _update({
-          key,
-          setter: () => {},
-          config: { ...config, clearPromise: true, error: e },
-        });
+        _update({ key, setter: undefined, config: { ...config, clearPromise: true, error: e } });
       });
 
-    const newValues = { ...stored.values, promise, config };
+    const newValues = { ...stored.values, promise };
     stored.values = newValues;
-    stored.subscribers.forEach((cb) => {
-      cb.fn([newValues, stored.status]);
-    });
+    stored.updatedAt = Date.now();
+    _resolve({ stored });
   };
 
-  const _refresh = <T>({ key, from: fromOverride }: _RefreshParams<T>) => {
+  const _delete = <T>({ key }: _DeleteParams) => {
     const stored = _read<T>({ key });
-    if (!stored) return;
-    if (stored.values.promise) return;
-
-    const from = fromOverride ?? stored.status.from;
-    if (!from) throw new Error("No fetcher found");
-
-    const setter = from();
-    if (isPromise(setter)) {
-      _updateAsync({ key: key, promise: setter, config: { override: true } });
-    } else {
-      _update({ key, setter, config: { override: true } });
-    }
-  };
-
-  const _check = <T>({ stored }: _CheckParams<T>) => {
-    if (
-      // refresh if values are totally empty
-      (stored.values.value === undefined &&
-        stored.values.promise === undefined &&
-        stored.values.error === undefined) ||
-      // or stored is stale
-      stored.updatedAt + (stored.status.staleTime ?? Infinity) < Date.now()
-    ) {
-      _refresh<T>({ key: stored.status.key });
-    }
+    if (!stored || stored.info.cacheTime === undefined) store.delete(key);
+    else _cache({ stored });
   };
 
   // public
@@ -199,47 +233,77 @@ export const createStore = () => {
     else _update({ key, setter, config });
   };
 
-  const subscribe = <T>({
-    key,
-    subscriptionKey,
-    subscriber,
-  }: SubscribeParams<T>) => {
-    const stored = get<T>({ key });
-    if (!stored) throw new Error("No stored found"); // TODO: Error handling
-    stored.subscribers.set(subscriptionKey, subscriber);
+  const subscribe = <T>({ key, subscriptionKey, subscriber }: SubscribeParams<T>) => {
+    const stored = _read<T>({ key });
+    if (!stored) throw new Error(`No stored found: ${key}`); // TODO: Error handling
 
+    // clear gc timer
+    if (stored.gcTimer !== null) {
+      clearTimeout(stored.gcTimer);
+      stored.gcTimer = null;
+    }
+
+    // add subscription
+    stored.subscribers.set(subscriptionKey, subscriber);
+    subscriber.next([stored.values, stored.info]);
     return () => {
       stored.subscribers.delete(subscriptionKey);
-      // TODO: Add cache logic
+      if (stored.subscribers.size < 1) _delete({ key });
     };
+  };
+
+  const clear = (key: Key) => {
+    const stored = _read({ key });
+    if (!stored) return;
+    const newValues = { value: undefined, promise: undefined, error: undefined };
+    stored.values = newValues;
+    stored.updatedAt = -1;
+    _resolve({ stored });
   };
 
   const invalidate = (key: Key) => {
     const stored = _read({ key });
     if (!stored) return;
-    stored.updatedAt = 0;
+    stored.updatedAt = -1;
     _check({ stored });
   };
 
+  const invalidateFilter = (key: Key) => {
+    store.forEach((stored, storedKey) => {
+      if (!storedKey.startsWith(key)) return;
+      stored.updatedAt = -1;
+      _check({ stored });
+    });
+  };
+
+  const setFilter = <T>({ key, setter, config }: SetParams<T>) => {
+    store.forEach((_, storedKey) => {
+      if (!storedKey.startsWith(key)) return;
+      set({ key: storedKey, setter, config });
+    });
+  };
+
   const checkAll = () => store.forEach((stored) => _check({ stored }));
+
   const invalidateAll = () =>
     store.forEach((stored) => {
-      stored.updatedAt = 0;
+      stored.updatedAt = -1;
       _check({ stored });
     });
 
-  const debug = () => store;
-
   return {
+    read: _read,
     get,
     set,
     subscribe,
+    clear,
     invalidate,
+    invalidateFilter,
+    setFilter,
     checkAll,
     invalidateAll,
-    debug,
   };
 };
 
 export type Store = ReturnType<typeof createStore>;
-export type StoreNext = Pick<Store, "set" | "invalidate">;
+export type Next = (store: Store) => void;

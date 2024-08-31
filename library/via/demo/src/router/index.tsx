@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Home from "../ui/home/Home";
-import FeConf from "../ui/feconf/FeConf";
+import PresentationHome from "../ui/presentation/page";
 
 export const router = createBrowserRouter([
   {
@@ -8,7 +8,8 @@ export const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/feconf-2024",
-    element: <FeConf />,
+    path: "presentation",
+    children: [{ path: ":presentationId", element: <PresentationHome />, children: [{ path: ":contentId" }] }],
+    errorElement: <div>Presentation Error</div>,
   },
 ]);

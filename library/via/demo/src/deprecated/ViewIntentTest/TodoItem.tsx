@@ -1,6 +1,6 @@
 // import { Div } from "@fluid/core";
 // import { Todo } from "../../core/entity/Todo";
-// import { useIntent } from "@via/react";
+// import { useIntent } from "viajs-react";
 // import { ToggleCompleteIntent } from "../../core/intent/toggleComplete";
 
 // type TodoProps = { todo: Todo; index: number };

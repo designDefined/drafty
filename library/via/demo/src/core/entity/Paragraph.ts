@@ -1,8 +1,15 @@
-import { FluidStyle } from "library/fluid/package/core";
+import { ID } from "./common/id";
+import { Font, Layout, Material } from "./common/style";
+import { Type } from "./common/type";
 
 export type Paragraph = {
-  id: number;
+  id: ID;
+  type: Type["Paragraph"];
   content: string;
-  textAlign: "left" | "center" | "right";
-  classNames: string[];
-} & FluidStyle;
+  style?: {
+    layout?: Layout;
+    material?: Material;
+    font?: Font;
+    align?: "left" | "center" | "right" | "justify";
+  };
+};

@@ -1,4 +1,4 @@
-// import { useView } from "@via/react";
+// import { useView } from "viajs-react";
 // import { MyDetailView } from "../../core/view/myDetail";
 
 // export default function MyDetail() {

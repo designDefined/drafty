@@ -1,33 +1,30 @@
-import { Model, Store } from "../store";
+import { Inferred, Parser, ParserTree } from "../input";
+import { Next } from "../store";
 import { Falsy } from "../util/falsy";
 import { hashKeys, RawKey } from "../util/hashKey";
-import { ModelTree } from "./input";
 
-export type IOModel<I, O> = {
-  items?: ModelTree<I>;
-  input?: Model<I>;
-  output?: Model<O>;
-};
-export type To<I, O> = (input: I) => O | Promise<O>;
-export type Next = (store: Store) => void;
-export type IntentParams<I, O> = {
+export type ToArgs<I> = I extends void ? never[] : [I];
+export type To<I, O> = (...args: ToArgs<I>) => O | Promise<O>;
+
+export type IntentParams<P extends ParserTree<unknown>, O> = {
   key: (RawKey | Falsy)[];
-  to?: To<I, O>;
-  from?: () => I;
-  next?: (result: { i: I; o: O }) => Next[];
-  catch?: (result: { i: I; error: unknown }) => Next[];
-  model?: IOModel<I, O>;
+  parser?: P;
+  to?: To<Inferred<P>, O>;
+  next?: (result: { i: Inferred<P>; o: O }) => (Next | Falsy)[];
+  catch?: (result: { i: Inferred<P>; error: unknown }) => (Next | Falsy)[];
+  model?: { i?: Parser<Inferred<P>>; o?: Parser<O> };
+  cacheTime?: number;
 };
 
 export type StoredIntent<I, O> = {
-  input?: I;
-  output?: O;
+  lastInput?: I;
+  lastOutput?: O;
   isWorking: boolean;
 };
 
 export const Intent =
-  <I, O, Deps extends unknown[] = never[]>(
-    params: (...deps: Deps) => IntentParams<I, O>,
+  <Deps extends unknown[] = never[], P extends ParserTree<unknown> = () => void, O = unknown>(
+    params: (...deps: Deps) => IntentParams<P, O>,
   ) =>
   (...args: Deps) => {
     const intent = params(...args);
@@ -35,6 +32,4 @@ export const Intent =
     return { ...intent, key };
   };
 
-export type Intent<I, O> = ReturnType<
-  ReturnType<typeof Intent<I, O, unknown[]>>
->;
+export type Intent<P extends ParserTree<unknown>, O> = ReturnType<ReturnType<typeof Intent<unknown[], P, O>>>;

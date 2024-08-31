@@ -1,45 +1,43 @@
-import { getValidInputFromInputTree, Intent, IntentParams } from "@via/core";
+import { Inferred, InputSetter, Intent, IntentParams, ParserTree, ToArgs } from "@via/core";
 import { useIntent } from "./useIntent";
 import { useIntentInput } from "./useIntentInput";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
-type UseIntentSubmitParams<I, O> = {
-  intent: Intent<I, O>;
-  from?: () => I;
-} & Omit<IntentParams<I, O>, "key">;
+type UseIntentSubmitParams<P extends ParserTree<unknown>, O> = {
+  intent: Intent<P, O>;
+  initialSetter?: InputSetter<P>;
+  cacheTime?: number;
+} & Omit<IntentParams<P, O>, "key" | "input">;
 
-export const useIntentSubmit = <I, O>({
-  intent,
-  from,
+export const useIntentSubmit = <P extends ParserTree<unknown>, O>({
+  intent: { key, ...intent },
+  initialSetter,
   ...params
-}: UseIntentSubmitParams<I, O>) => {
-  const { send, isWorking } = useIntent<I, O>({ intent, ...params });
-  const { values, set, reset } = useIntentInput<I, O>({ intent, from });
+}: UseIntentSubmitParams<P, O>) => {
+  const needReset = useRef(false);
+  const { send, isWorking } = useIntent<P, O>({ intent: { ...intent, key }, ...params });
+  const { value, current, currentInput, isEmpty, errors, state, set, reset } = useIntentInput<P, O>({
+    intent: { ...intent, key },
+    initialSetter,
+    cacheTime: params.cacheTime ?? intent.cacheTime,
+  });
 
-  const { inputValues, error } = useMemo(() => {
-    try {
-      const inputValues = getValidInputFromInputTree(values);
-      return { inputValues, error: undefined };
-    } catch (e) {
-      return { inputValues: undefined, error: e };
-    }
-  }, [values]);
+  const isValid = useMemo(() => {
+    return errors.length === 0 && !isEmpty;
+  }, [key, errors, isEmpty]);
 
   const submit = useCallback(() => {
-    if (error) return Promise.reject(error);
-    return send(inputValues as I).then((response) => {
-      reset();
-      return response;
+    if (!isValid) return Promise.reject(errors[0]); // TODO: Merge error
+    return send(...([currentInput] as ToArgs<Inferred<P>>)).then(output => {
+      needReset.current = true; // Do not reset immmediately.
+      return output;
     });
-  }, [inputValues, error, reset, send]);
+  }, [key, currentInput, errors, isValid, send]);
 
-  return {
-    submit,
-    values,
-    set,
-    inputValues,
-    error,
-    isWorking,
-    isValid: !error,
-  };
+  // Reset at the next render after the submission.
+  useEffect(() => {
+    if (!isWorking && needReset.current === true) reset();
+  }, [isWorking]);
+
+  return { set, send, reset, submit, value, current, currentInput, state, errors, isEmpty, isWorking, isValid };
 };

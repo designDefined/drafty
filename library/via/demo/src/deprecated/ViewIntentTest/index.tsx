@@ -1,4 +1,4 @@
-// import { useView } from "@via/react";
+// import { useView } from "viajs-react";
 // import { useEffect, useState } from "react";
 // import { Div, Span } from "@fluid/core";
 
